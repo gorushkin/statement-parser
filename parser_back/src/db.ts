@@ -21,9 +21,9 @@ export class DB {
     this.ratesPath = join(this.dbPath, 'rates.json');
     const isPathExist = await this.checkPath(this.dbPath);
     if (!isPathExist) {
-      await this.makeDbFolder(this.dbPath);
+      await this.makeFolder(this.dbPath);
       logger.info(`Add folder for DB "${this.dbPath}"`);
-      await this.makeDbFolder(this.transactionsPath);
+      await this.makeFolder(this.transactionsPath);
       logger.info(`Add folder for transactions "${this.transactionsPath}"`);
       await fs.writeFile(this.ratesPath, JSON.stringify({}), 'utf-8');
       logger.info(`Add file for transactions "${this.transactionsPath}"`);
@@ -39,14 +39,14 @@ export class DB {
     }
     const isTransactionsPathExist = await this.checkPath(this.transactionsPath);
     if (!isTransactionsPathExist) {
-      await this.makeDbFolder(this.transactionsPath);
+      await this.makeFolder(this.transactionsPath);
       logger.info(`Add folder for transactions "${this.transactionsPath}"`);
     } else {
       logger.info(`Transactions dir exist`);
     }
   }
 
-  private async makeDbFolder(path: string) {
+  private async makeFolder(path: string) {
     try {
       await fs.mkdir(path);
     } catch (error) {
@@ -66,13 +66,13 @@ export class DB {
   private async writeData(filePath: string, serializedData: string) {
     try {
       await fs.writeFile(filePath, serializedData);
-      return { data: 'The statement was updated succesfully', error: null, ok: true };
+      return { data: 'The statement was updated successfully', error: null, ok: true };
     } catch (error) {
       return { data: null, error, ok: false };
     }
   }
 
-  private async readJSONData(path: string): Promise<any | void> {
+  private async readJSONData(path: string): Promise<Rates | never> {
     try {
       const data = JSON.parse(await fs.readFile(path, 'utf-8'));
       return data;
@@ -83,7 +83,7 @@ export class DB {
     }
   }
 
-  private async writeJSONData(path: string, data: any): Promise<any | void> {
+  private async writeJSONData(path: string, data: any): Promise<void> {
     try {
       await fs.writeFile(path, JSON.stringify(data, null, 2));
     } catch (error) {
@@ -120,9 +120,7 @@ export class DB {
 
   private async getCurrencyValue(date: string, currency: Currency) {
     try {
-      if (!this.rates[date]) {
-        this.rates = await this.readJSONData(this.ratesPath);
-      }
+      if (!this.rates[date]) this.rates = await this.readJSONData(this.ratesPath);
       return this.rates[date][currency].value;
     } catch (error) {
       throw new DBError('Something wrong with rates reading');
@@ -146,12 +144,12 @@ export class DB {
     };
   }
 
-  async updateStatement(data: Transaction[], name: string) {
+  async generateStatement(data: Transaction[], name: string) {
     try {
       const nameWithExt = `${name}.json`;
       const filePath = join(this.transactionsPath, nameWithExt);
       await this.updateCurrencyRates(data);
-      const dataWithCurencyPromises = data.map(async (item) => {
+      const dataWithCurrencyPromises = data.map(async (item) => {
         const rate = await this.getCurrencyValue(this.formatDate(item.processDate), 'TRY');
         const convertedAmount = getRoundedValue(rate * item.amount);
         return {
@@ -164,7 +162,7 @@ export class DB {
         };
       });
 
-      const transactions = await Promise.all(dataWithCurencyPromises);
+      const transactions = await Promise.all(dataWithCurrencyPromises);
 
       const summary = transactions.reduce<GroupedSummary>(
         (acc, { amount, balance, convertedAmount, convertedBalance }, i, list) => {

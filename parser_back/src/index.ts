@@ -14,8 +14,6 @@ export const logger = pino({
   },
 });
 
-logger.info('start server');
-
 export const db = new DB();
 db.init(dbPath);
 
@@ -25,17 +23,18 @@ const PORT = 3000;
 const tempFilesPath = join(process.cwd(), 'files');
 
 const init = async (app: Express, tempFilesPath: string, port: number) => {
-  // await checkFilesPath(tempFilesPath);
-  // app.use(cors());
-  // const options = {
-  //   uploadDir: tempFilesPath,
-  //   autoClean: true,
-  // };
-  // app.use(formData.parse(options));
-  // app.use('/', router);
-  // app.listen(3000, () => {
-  //   console.log(`app started on port ${port}`);
-  // });
+  await checkFilesPath(tempFilesPath);
+  logger.info(`Temp files dir exist`);
+  app.use(cors());
+  const options = {
+    uploadDir: tempFilesPath,
+    autoClean: true,
+  };
+  app.use(formData.parse(options));
+  app.use('/', router);
+  app.listen(3000, () => {
+    logger.info(`Server started on port ${port}`);
+  });
 };
 
 init(app, tempFilesPath, PORT);
