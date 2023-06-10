@@ -1,0 +1,14 @@
+.wrapper {
+  display: flex;
+  place-items: center;
+}
+
+.controls {
+  gap: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.dropzone {
+  margin-bottom: 2rem;
+}

@@ -1,0 +1,42 @@
+.wrapper {
+  position: relative;
+  padding-top: 25px;
+}
+
+.row {
+  display: flex;
+  margin-bottom: 1rem;
+  padding: 0 10px;
+}
+
+.info {
+  margin-bottom: 1rem;
+  background: rgb(20, 95, 5);
+  color: #ffffff;
+  display: inline-block;
+  padding: 0 25px;
+
+  &Warning {
+    background: red;
+  }
+}
+
+.controls {
+  justify-content: space-between;
+}
+
+.buttonWrapper {
+  display: flex;
+  flex-wrap: nowrap;
+  button + button {
+    margin-left: 15px;
+  }
+
+  &Right {
+    margin-left: auto;
+  }
+}
+
+.buttonLink {
+  margin-left: 1rem;
+}

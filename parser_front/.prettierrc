@@ -1,0 +1,14 @@
+{
+  "singleQuote": true,
+  "printWidth": 80,
+  "proseWrap": "always",
+  "overrides": [
+    {
+      "files": "**/*.+(scss|less)",
+      "options": {
+        "singleQuote": false,
+        "tabWidth": 2
+      }
+    }
+  ]
+}
