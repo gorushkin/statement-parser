@@ -3,11 +3,12 @@ import { Transaction } from 'parser';
 import fs from 'fs/promises';
 import { DBError, ERROR_PLACES } from '../errors/error';
 import dayjs from 'dayjs';
-import { getRates, getRoundedValue } from '../helpers/until';
+import { getPath, getRates, getRoundedValue } from '../helpers/until';
 import { Currency } from '../helpers/types';
-import { defaultCurrency } from '../helpers/constants';
 import { logger } from '../logger';
 import { DBResult, GroupedSummary, Rates, Summary } from './types';
+
+const defaultCurrency: Currency = 'TRY';
 
 export class DataBase {
   transactionsPath: string;
@@ -16,7 +17,8 @@ export class DataBase {
   rates: Rates = {} as Rates;
 
   async init(path: string) {
-    logger.info(`Start BD init, path is "${path}"`);
+    const absolutePath = getPath(path);
+    logger.info(`Start BD init, path is "${absolutePath}"`);
     this.dbPath = join(process.cwd(), path);
     this.transactionsPath = join(this.dbPath, 'statements');
     this.ratesPath = join(this.dbPath, 'rates.json');

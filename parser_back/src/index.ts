@@ -1,10 +1,9 @@
 import { Express } from 'express';
-import { tempFilesPath } from './helpers/constants';
 import { checkFilesPath } from './helpers/until';
 import { app } from './app';
 import { logger } from './logger';
 import { db } from './dataBase';
-import { DB_PATH, PORT } from './helpers/config';
+import { DB_PATH, PORT, TEMP_FILES_PATH } from './helpers/config';
 
 const init = async (app: Express, tempFilesPath: string, port: number, dbPath: string) => {
   db.init(dbPath);
@@ -16,4 +15,4 @@ const init = async (app: Express, tempFilesPath: string, port: number, dbPath: s
   });
 };
 
-init(app, tempFilesPath, PORT, DB_PATH);
+init(app, TEMP_FILES_PATH, PORT, DB_PATH);
