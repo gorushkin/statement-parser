@@ -1,18 +1,19 @@
-import { Parser, Transaction } from 'parser';
+import { Parser } from 'parser';
 import { Request, Response } from 'express';
-import { FormattedRequest } from './types';
 import fs from 'fs/promises';
-import { db, logger } from '.';
-import { getBody } from './until';
-import { AppError } from './error';
+import { getBody } from '../../helpers/until';
+import { AppError } from '../../error';
+import { logger } from '../../logger';
+import { db } from '../../dataBase';
+import { FormattedRequest, StatementPayload } from './types';
 const parser = new Parser();
 
 export const getData = (data: Buffer) => parser.parse(data);
 
 export const uploadFile = async (req: Request, res: Response) => {
   try {
-    const qwe = req as FormattedRequest;
-    const files = Object.values(qwe.files);
+    const formattedRequest = req as unknown as FormattedRequest;
+    const files = Object.values(formattedRequest.files);
     const fileInfo = files[0];
     const { fieldName, path } = fileInfo;
     const fileContent = await fs.readFile(path);
@@ -44,11 +45,6 @@ export const getStatement = async (req: Request, res: Response) => {
   const result = await db.getStatement(name);
   if (result.ok) return res.status(200).send({ data: result.data });
   res.status(400).send({ error: result.error });
-};
-
-type StatementPayload = {
-  name: string;
-  statement: Transaction[];
 };
 
 export const uploadStatement = async (req: Request, res: Response) => {

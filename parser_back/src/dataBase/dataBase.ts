@@ -1,14 +1,15 @@
 import path, { join } from 'path';
 import { Transaction } from 'parser';
 import fs from 'fs/promises';
-import { DBError } from './error';
+import { DBError } from '../error';
 import dayjs from 'dayjs';
-import { getRate, getRoundedValue } from './until';
-import { Rates, Currency, DBResult, Summary, GroupedSummary } from './types';
-import { defaultCurrency } from './constants';
-import { logger } from '.';
+import { getRate, getRoundedValue } from '../helpers/until';
+import { Currency } from '../helpers/types';
+import { defaultCurrency } from '../helpers/constants';
+import { logger } from '../logger';
+import { DBResult, GroupedSummary, Rates, Summary } from './types';
 
-export class DB {
+export class DataBase {
   transactionsPath: string;
   ratesPath: string;
   dbPath: string;
@@ -237,3 +238,5 @@ export class DB {
     }
   }
 }
+
+export default DataBase;

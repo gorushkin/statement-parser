@@ -5,7 +5,6 @@ export class DBError extends Error {
   }
 }
 
-
 export class AppError extends Error {
   constructor(message: string) {
     super(message);
