@@ -1,9 +1,9 @@
 import path, { join } from 'path';
 import { Transaction } from 'parser';
 import fs from 'fs/promises';
-import { DBError } from '../error';
+import { DBError } from '../errors/error';
 import dayjs from 'dayjs';
-import { getRate, getRoundedValue } from '../helpers/until';
+import { getRates, getRoundedValue } from '../helpers/until';
 import { Rates, Currency, DBResult, Summary, GroupedSummary } from '../helpers/types';
 import { defaultCurrency } from '../helpers/constants';
 import { logger } from '../logger';
@@ -102,7 +102,7 @@ export class DB {
     const filteredDates = Array.from(new Set(dates));
 
     const promises = filteredDates.map(async (date) => {
-      const currencies = await getRate(date);
+      const currencies = await getRates(date);
       return { date, currencies };
     });
 

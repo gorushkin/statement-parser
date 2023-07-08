@@ -1,9 +1,9 @@
 import path, { join } from 'path';
 import { Transaction } from 'parser';
 import fs from 'fs/promises';
-import { DBError } from '../error';
+import { DBError, ERROR_PLACES } from '../errors/error';
 import dayjs from 'dayjs';
-import { getRate, getRoundedValue } from '../helpers/until';
+import { getRates, getRoundedValue } from '../helpers/until';
 import { Currency } from '../helpers/types';
 import { defaultCurrency } from '../helpers/constants';
 import { logger } from '../logger';
@@ -80,7 +80,7 @@ export class DataBase {
     } catch (error) {
       console.log('error: ', error);
       // TODO: Добавить создание файла при его отсутсвии
-      throw new DBError('There is an error with reading currencies');
+      throw new DBError(ERROR_PLACES.readJSONData);
     }
   }
 
@@ -88,7 +88,7 @@ export class DataBase {
     try {
       await fs.writeFile(path, JSON.stringify(data, null, 2));
     } catch (error) {
-      throw new DBError('There is an error with adding currencies');
+      throw new DBError(ERROR_PLACES.writeJSONData);
     }
   }
 
@@ -103,7 +103,7 @@ export class DataBase {
     const filteredDates = Array.from(new Set(dates));
 
     const promises = filteredDates.map(async (date) => {
-      const currencies = await getRate(date);
+      const currencies = await getRates(date);
       return { date, currencies };
     });
 
@@ -124,7 +124,7 @@ export class DataBase {
       if (!this.rates[date]) this.rates = await this.readJSONData(this.ratesPath);
       return this.rates[date][currency].value;
     } catch (error) {
-      throw new DBError('Something wrong with rates reading');
+      throw new DBError(ERROR_PLACES.getCurrencyValue);
     }
   }
 
@@ -230,7 +230,7 @@ export class DataBase {
     const serializedData = JSON.stringify(statement, null, 2);
     const isTargetExist = await this.checkPath(filePath);
     try {
-      if (!isTargetExist) throw new DBError('The file name is not correct');
+      if (!isTargetExist) throw new DBError(ERROR_PLACES.saveStatement);
       return await this.writeData(filePath, serializedData);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Something went wrong';

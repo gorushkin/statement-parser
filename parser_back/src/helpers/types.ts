@@ -1,6 +1,6 @@
 export type Currency = 'TRY' | 'USD' | 'RUB';
 
-export interface CurResponse {
+export interface CBRCurrencies {
   ValCurs: {
     Valute: {
       CharCode: {
@@ -19,14 +19,13 @@ export interface CurResponse {
   };
 }
 
-export type Currencies = Record<
-  Currency,
-  {
-    name: string;
-    value: number;
-    _nominal: number;
-    code: Currency;
-    _value: number;
-    convertedValue: number;
-  }
->;
+type CurrencyInfo = {
+  name: string;
+  value: number;
+  responseNominal: number;
+  code: Currency;
+  responseValue: number;
+  convertedValue: number;
+};
+
+export type Currencies = Record<Currency, CurrencyInfo>;

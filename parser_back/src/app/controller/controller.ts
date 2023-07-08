@@ -1,11 +1,11 @@
 import { Parser } from 'parser';
 import { Request, Response } from 'express';
 import fs from 'fs/promises';
-import { getBody } from '../../helpers/until';
-import { AppError } from '../../error';
+import { AppError, BaseError, ERROR_PLACES } from '../../errors/error';
 import { logger } from '../../logger';
 import { db } from '../../dataBase';
 import { FormattedRequest, StatementPayload } from './types';
+import { getBody } from '../utils';
 const parser = new Parser();
 
 export const getData = (data: Buffer) => parser.parse(data);
@@ -25,10 +25,9 @@ export const uploadFile = async (req: Request, res: Response) => {
         message: `File "${fieldName}" was uploaded and will be available in a few minutes`,
       });
     }
-    const message = error instanceof Error ? error.message : 'Something went wrong';
-    throw new AppError(message);
+    throw new AppError(ERROR_PLACES.uploadFile, error);
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Something went wrong';
+    const message = error instanceof BaseError ? error.message : 'Something went wrong';
     logger.error(`There is an error with file uploading with text/n${message}`);
     res.status(400).send({ error: message });
   }
