@@ -139,8 +139,8 @@ export class DataBase {
     lastIndex: number
   ): Summary {
     return {
-      ...(currentIndex === firstIndex && { startBalance: getRoundedValue(balance - amount) }),
       ...summary,
+      ...(currentIndex === firstIndex && { startBalance: getRoundedValue(balance - amount) }),
       ...(amount >= 0 && { income: getRoundedValue(summary.income + amount) }),
       ...(amount < 0 && { outcome: getRoundedValue(summary.outcome - amount) }),
       ...(currentIndex === lastIndex && { endBalance: getRoundedValue(balance) }),
