@@ -10,7 +10,7 @@ const init = async (app: Express, tempFilesPath: string, port: number, dbPath: s
   await checkFilesPath(tempFilesPath);
   logger.info(`Temp files dir exist`);
 
-  app.listen(3000, () => {
+  app.listen(port, () => {
     logger.info(`Server started on port ${port}`);
   });
 };
