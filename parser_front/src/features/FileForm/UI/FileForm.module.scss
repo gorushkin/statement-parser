@@ -30,6 +30,14 @@ $invalid: #CBD5E0;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 10px;
+  row-gap: 16px;
+}
+
+.input {
+  background: white !important ;
+  outline: 2px solid red;
+  text-align: center;
 }
 
 .link {

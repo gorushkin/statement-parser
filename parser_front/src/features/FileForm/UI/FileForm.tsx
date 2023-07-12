@@ -1,4 +1,4 @@
-import { Box, Button, Container, Text } from '@chakra-ui/react';
+import { Box, Button, Container, Input, Text } from '@chakra-ui/react';
 import { ChangeEvent, DragEvent, FC, useRef, useState } from 'react';
 import { useFetch } from 'src/shared/useFetch';
 import { cn } from 'src/shared/utils';
@@ -12,15 +12,15 @@ type FileInfo = {
   size: number;
 };
 
-type FROM_MODE = 'file' | 'name';
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface DropZoneProps {}
-
-const FileForm: FC<DropZoneProps> = () => {
+const FileForm: FC = () => {
   const [fileInfo, setFileInfo] = useState<FileInfo | null>(null);
   const [isHover, setIsHover] = useState(false);
-  const input = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [name, setName] = useState('');
+
+  const [isFormValid, setIsFromValid] = useState(false);
+
+  const isResetButtonDisabled = !fileInfo;
 
   const fileStateUpdateHandler = (files: FileList) => {
     for (const file of files) {
@@ -48,8 +48,9 @@ const FileForm: FC<DropZoneProps> = () => {
 
   const handleResetButtonClick = () => {
     setFileInfo(null);
-    if (input.current) {
-      input.current.files = null;
+    setIsFromValid(false);
+    if (inputRef.current) {
+      inputRef.current.files = null;
     }
   };
 
@@ -59,21 +60,25 @@ const FileForm: FC<DropZoneProps> = () => {
 
   const handleStartButtonClick = () => {
     if (!fileInfo) return;
-    void fetchData({ file: fileInfo.file, name: 'uuuu' });
+    void fetchData({ file: fileInfo.file, name });
   };
 
   const handleAddFileButtonClick = () => {
-    if (!input.current) return;
-    input.current.click();
+    if (!inputRef.current) return;
+    inputRef.current.click();
   };
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
     if (!files) return;
     fileStateUpdateHandler(files);
   };
 
-  const isFormValid = !!fileInfo;
+  const handleInputChange = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
+    const trimmedValue = value.trim();
+    setName(trimmedValue);
+    setIsFromValid(!!trimmedValue && !!fileInfo?.name);
+  };
 
   return (
     <Container>
@@ -85,9 +90,10 @@ const FileForm: FC<DropZoneProps> = () => {
         title={fileInfo?.name ? fileInfo?.name : ''}
       >
         {fileInfo?.name && (
-          <Text className={styles.textWrapper} isTruncated>
-            {fileInfo.name}
-          </Text>
+          <Box className={styles.textWrapper} isTruncated>
+            <Text className={styles.filename}>{fileInfo.name}</Text>
+            <Input className={styles.input} name="name" onChange={handleInputChange} type="text" />
+          </Box>
         )}
         {!fileInfo && (
           <Text textAlign={'center'}>
@@ -97,9 +103,18 @@ const FileForm: FC<DropZoneProps> = () => {
             </Text>
           </Text>
         )}
+        <input hidden={true} name="file" onChange={handleFileInputChange} ref={inputRef} type="file" />
       </Box>
-      <input hidden={true} onChange={handleInputChange} ref={input} type="file" />
       <Box className={styles.buttonGroup}>
+        <Button
+          background={'red.400'}
+          isDisabled={isResetButtonDisabled}
+          onClick={handleResetButtonClick}
+          size={'lg'}
+          variant={'outline'}
+        >
+          Reset
+        </Button>
         <Button
           background={'green.400'}
           isDisabled={!isFormValid}
@@ -108,15 +123,6 @@ const FileForm: FC<DropZoneProps> = () => {
           variant={'solid'}
         >
           Upload
-        </Button>
-        <Button
-          background={'red.400'}
-          isDisabled={!isFormValid}
-          onClick={handleResetButtonClick}
-          size={'lg'}
-          variant={'outline'}
-        >
-          Reset
         </Button>
       </Box>
     </Container>
