@@ -1,21 +1,24 @@
 import path, { join } from 'path';
 import { Transaction } from 'parser';
 import fs from 'fs/promises';
-import { DBError } from './error';
+import { DBError, ERROR_PLACES } from '../errors/error';
 import dayjs from 'dayjs';
-import { getRate, getRoundedValue } from './until';
-import { Rates, Currency, DBResult, Summary, GroupedSummary } from './types';
-import { defaultCurrency } from './constants';
-import { logger } from '.';
+import { getPath, getRates, getRoundedValue } from '../helpers/until';
+import { Currency } from '../helpers/types';
+import { logger } from '../logger';
+import { DBResult, GroupedSummary, Rates, Summary } from './types';
 
-export class DB {
+const defaultCurrency: Currency = 'TRY';
+
+export class DataBase {
   transactionsPath: string;
   ratesPath: string;
   dbPath: string;
   rates: Rates = {} as Rates;
 
   async init(path: string) {
-    logger.info(`Start BD init, path is "${path}"`);
+    const absolutePath = getPath(path);
+    logger.info(`Start BD init, path is "${absolutePath}"`);
     this.dbPath = join(process.cwd(), path);
     this.transactionsPath = join(this.dbPath, 'statements');
     this.ratesPath = join(this.dbPath, 'rates.json');
@@ -79,7 +82,7 @@ export class DB {
     } catch (error) {
       console.log('error: ', error);
       // TODO: Добавить создание файла при его отсутсвии
-      throw new DBError('There is an error with reading currencies');
+      throw new DBError(ERROR_PLACES.readJSONData);
     }
   }
 
@@ -87,7 +90,7 @@ export class DB {
     try {
       await fs.writeFile(path, JSON.stringify(data, null, 2));
     } catch (error) {
-      throw new DBError('There is an error with adding currencies');
+      throw new DBError(ERROR_PLACES.writeJSONData);
     }
   }
 
@@ -102,7 +105,7 @@ export class DB {
     const filteredDates = Array.from(new Set(dates));
 
     const promises = filteredDates.map(async (date) => {
-      const currencies = await getRate(date);
+      const currencies = await getRates(date);
       return { date, currencies };
     });
 
@@ -123,7 +126,7 @@ export class DB {
       if (!this.rates[date]) this.rates = await this.readJSONData(this.ratesPath);
       return this.rates[date][currency].value;
     } catch (error) {
-      throw new DBError('Something wrong with rates reading');
+      throw new DBError(ERROR_PLACES.getCurrencyValue);
     }
   }
 
@@ -136,8 +139,8 @@ export class DB {
     lastIndex: number
   ): Summary {
     return {
-      ...(currentIndex === firstIndex && { startBalance: getRoundedValue(balance - amount) }),
       ...summary,
+      ...(currentIndex === firstIndex && { startBalance: getRoundedValue(balance - amount) }),
       ...(amount >= 0 && { income: getRoundedValue(summary.income + amount) }),
       ...(amount < 0 && { outcome: getRoundedValue(summary.outcome - amount) }),
       ...(currentIndex === lastIndex && { endBalance: getRoundedValue(balance) }),
@@ -229,7 +232,7 @@ export class DB {
     const serializedData = JSON.stringify(statement, null, 2);
     const isTargetExist = await this.checkPath(filePath);
     try {
-      if (!isTargetExist) throw new DBError('The file name is not correct');
+      if (!isTargetExist) throw new DBError(ERROR_PLACES.saveStatement);
       return await this.writeData(filePath, serializedData);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Something went wrong';
@@ -237,3 +240,5 @@ export class DB {
     }
   }
 }
+
+export default DataBase;
