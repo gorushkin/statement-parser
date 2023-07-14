@@ -3,7 +3,7 @@ import { ChangeEvent, DragEvent, FC, useRef, useState } from 'react';
 import { useFetch } from 'src/shared/useFetch';
 import { cn } from 'src/shared/utils';
 
-import { uploadFileRequest } from '../API';
+import { uploadFileRequest } from '../api';
 import styles from './FileForm.module.scss';
 
 type FileInfo = {
