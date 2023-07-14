@@ -1,21 +1,21 @@
-import { Alert, AlertDescription, AlertIcon, AlertTitle } from '@chakra-ui/react';
+import { Alert, AlertDescription, AlertIcon, AlertTitle, CloseButton } from '@chakra-ui/react';
 import { observer } from 'mobx-react';
 import { FC } from 'react';
 
 import { notificationStore } from '../index';
+import styles from './Notifications.module.scss';
 
 const Notifications: FC = observer(() => {
-  const { message, status } = notificationStore;
+  const { notifications } = notificationStore;
 
-  if (!status) return null;
-
-  return (
-    <Alert status={status}>
+  return notifications.map(({ destroy, id, message, status }) => (
+    <Alert className={styles.wrapper} key={id} status={status}>
       <AlertIcon />
       <AlertTitle>{status.toUpperCase()}:</AlertTitle>
       <AlertDescription>{message}</AlertDescription>
+      <CloseButton className={styles.closeButton} onClick={destroy} />
     </Alert>
-  );
+  ));
 });
 
 export { Notifications };
