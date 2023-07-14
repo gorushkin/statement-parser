@@ -23,6 +23,7 @@ export const uploadFile = async (req: Request, res: Response) => {
       logger.info(`File "${fieldName}" was successfully uploaded`);
       return res.status(200).send({
         message: `File "${fieldName}" was uploaded and will be available in a few minutes`,
+        ok: true,
       });
     }
     throw new AppError(ERROR_PLACES.uploadFile, error);
