@@ -1,1 +1,1 @@
-export { FileForm } from './UI/FileForm';
+export { FileForm } from './ui/FileForm';

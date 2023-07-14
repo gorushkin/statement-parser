@@ -20,7 +20,10 @@ const FileForm: FC = () => {
 
   const [isFormValid, setIsFromValid] = useState(false);
 
+  const [{ error, handleReset }, fetchData] = useFetch(uploadFileRequest);
+
   const isResetButtonDisabled = !fileInfo;
+  const isUploadButtonDisabled = !isFormValid || !!error;
 
   const fileStateUpdateHandler = (files: FileList) => {
     for (const file of files) {
@@ -52,11 +55,8 @@ const FileForm: FC = () => {
     if (inputRef.current) {
       inputRef.current.files = null;
     }
+    handleReset();
   };
-
-  const [{ error, message }, fetchData] = useFetch(uploadFileRequest);
-  console.log('error: ', error);
-  console.log('message: ', message);
 
   const handleStartButtonClick = () => {
     if (!fileInfo) return;
@@ -117,7 +117,7 @@ const FileForm: FC = () => {
         </Button>
         <Button
           background={'green.400'}
-          isDisabled={!isFormValid}
+          isDisabled={isUploadButtonDisabled}
           onClick={handleStartButtonClick}
           size={'lg'}
           variant={'solid'}
