@@ -32,7 +32,6 @@ export const useFetch = <T, K>(cb: Request<T>): UseFetch<T, K> => {
   const handleReset = useCallback(() => {
     setMessage(null);
     setError(null);
-    notificationStore.hideNotification();
   }, []);
 
   const fetchData = useCallback(
@@ -44,14 +43,14 @@ export const useFetch = <T, K>(cb: Request<T>): UseFetch<T, K> => {
         const message = response.message ?? DEFAULT_SUCCESS_MESSAGE;
         setData(response.data ? response.data : null);
         setMessage(response.message);
-        notificationStore.showNotification({ message, status: 'success' });
+        notificationStore.addNotification({ message, status: 'success' });
       } catch (error) {
         // TODO: add displaying errors
         setData(null);
         setMessage(null);
         const message = error instanceof ApiError ? error.message : DEFAULT_ERROR_MESSAGE;
         setError(message);
-        notificationStore.showNotification({ message, status: 'error' });
+        notificationStore.addNotification({ message, status: 'error' });
       } finally {
         setIsLoading(false);
       }
