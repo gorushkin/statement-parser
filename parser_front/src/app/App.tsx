@@ -1,11 +1,11 @@
 import { Box, Container } from '@chakra-ui/react';
 import { FC } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import { routes } from 'src/shared/routes';
 import { Navbar } from 'src/widgets/Navbar';
 import { Alert } from 'src/widgets/Notifications';
 
 import style from './App.module.scss';
-import { routes } from './routes';
 
 const App: FC = () => (
   <Box as="main" className={style.layout} minH={'100vh'}>

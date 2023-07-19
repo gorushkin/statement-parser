@@ -1,6 +1,6 @@
 import { makeAutoObservable } from 'mobx';
 
-type Status = 'error' | 'info' | 'success' | 'warning';
+export type Status = 'error' | 'info' | 'success' | 'warning';
 
 const DEFAULT_TIMER = 5000;
 
@@ -31,10 +31,14 @@ class Notification {
 }
 
 class NotificationStore {
+  addErrorMessage = (message: string) => this.addNotification({ message, status: 'error' });
+
   addNotification = ({ message, status }: { message: string; status: Status }) => {
     const notification = new Notification({ message, onDestroy: this.removeNotification, status });
     this.notifications.push(notification);
   };
+
+  addSuccessMessage = (message: string) => this.addNotification({ message, status: 'success' });
 
   notifications: Notification[];
 

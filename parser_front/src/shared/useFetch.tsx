@@ -1,6 +1,5 @@
-import { useCallback, useState } from 'react';
-import { Request, Response } from 'src/app/config';
-import { notificationStore } from 'src/features/Notifications';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { Request } from 'src/app/config';
 
 class ApiError extends Error {
   constructor(message: string) {
@@ -8,54 +7,70 @@ class ApiError extends Error {
   }
 }
 
-type UseFetch<T, K> = [
+type UseFetchResult<T, K> = [
   {
-    data: K | null;
+    data: K;
     error: null | string;
     handleReset: () => void;
     isLoading: boolean;
     message: null | string;
   },
-  (args: T) => Promise<void>,
+  (args?: T) => Promise<void>,
 ];
 
 const DEFAULT_SUCCESS_MESSAGE = 'Your action has been completed successfully.';
 const DEFAULT_ERROR_MESSAGE = 'Your action could not be completed. Please try again later.';
 
+type CallBack<K> = (args: { data: K; message: string }) => void;
+
+export type UseFetchParams<K> = {
+  init: K;
+  onError: CallBack<K>;
+  onSuccess: CallBack<K>;
+};
+
+type UseFetch = <T, K>(cb: Request<T, K>, params: UseFetchParams<K>) => UseFetchResult<T, K>;
+
 // eslint-disable-next-line @typescript-eslint/ban-types
-export const useFetch = <T, K>(cb: Request<T>): UseFetch<T, K> => {
+export const useFetch: UseFetch = <T, K>(cb: Request<T, K>, params: UseFetchParams<K>) => {
+  const initValue = useMemo(() => params?.init ?? ({} as K), [params?.init]);
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState<K | null>(null);
+  const [data, setData] = useState<K>(initValue);
   const [message, setMessage] = useState<null | string>(null);
   const [error, setError] = useState<null | string>(null);
+  const isEnabled = useRef(true);
 
   const handleReset = useCallback(() => {
     setMessage(null);
     setError(null);
-  }, []);
+    setData(initValue);
+    isEnabled.current = true;
+  }, [initValue]);
 
   const fetchData = useCallback(
-    async (args: T) => {
+    async (args = {} as T) => {
+      if (!isEnabled.current) return;
+      isEnabled.current = false;
       setIsLoading(true);
       try {
-        const response = (await cb(args)) as Response<K>;
+        const response = await cb(args);
         if (!response.ok) throw new ApiError(response.error);
         const message = response.message ?? DEFAULT_SUCCESS_MESSAGE;
-        setData(response.data ? response.data : null);
+        const result = response.data ?? initValue;
+        setData(result);
         setMessage(response.message);
-        notificationStore.addNotification({ message, status: 'success' });
+        params.onSuccess({ data: result, message });
       } catch (error) {
-        // TODO: add displaying errors
-        setData(null);
+        setData(initValue);
         setMessage(null);
         const message = error instanceof ApiError ? error.message : DEFAULT_ERROR_MESSAGE;
+        params.onError({ data: initValue, message });
         setError(message);
-        notificationStore.addNotification({ message, status: 'error' });
       } finally {
         setIsLoading(false);
       }
     },
-    [cb]
+    [cb, initValue, params]
   );
 
   return [{ data, error, handleReset, isLoading, message }, fetchData];

@@ -1,5 +1,5 @@
 import { RouteObject } from 'react-router-dom';
-import { Statements } from 'src/pages/Statements';
+import { StatementsPage } from 'src/pages/StatementsPage';
 import { UploadFilePage } from 'src/pages/UploadFilePage';
 
 type ROUTE = RouteObject & {
@@ -12,5 +12,5 @@ export const routes: ROUTE[] = [
   { element: <UploadFilePage />, isNav: true, name: 'Upload File', path: '/upload' },
   { element: <UploadFilePage />, isNav: false, name: 'Upload File', path: '/' },
   { element: <UploadFilePage />, isNav: false, name: 'Upload File', path: '*' },
-  { element: <Statements />, isNav: true, name: 'Statements', path: '/statements' },
+  { element: <StatementsPage />, isNav: true, name: 'Statements', path: '/statements' },
 ];
