@@ -36,7 +36,7 @@ export const uploadFile = async (req: Request, res: Response) => {
 
 export const getStatements = async (_req: Request, res: Response) => {
   const { data, error, ok } = await db.getStatements();
-  if (ok) return res.status(200).send({ data });
+  if (ok) return res.status(200).send({ data, ok: true });
   res.status(400).send({ error });
 };
 
