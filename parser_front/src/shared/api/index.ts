@@ -1,3 +1,2 @@
-import { instance, Request, Response } from './api';
-export { instance as axios };
-export type { Request, Response };
+export { instance as axios } from './api';
+export type { Request, Response } from './types';
