@@ -7,12 +7,11 @@ import { getStatementsRequest } from '../api';
 import styles from './StatementsList.module.scss';
 
 const StatementsList: FC = () => {
-  const { addErrorMessage, addSuccessMessage } = useNotify();
+  const { addErrorMessage } = useNotify();
 
   const [{ data }, fetchData] = useFetch(getStatementsRequest, {
     init: [],
     onError: addErrorMessage,
-    onSuccess: addSuccessMessage,
   });
 
   useEffect(() => {
