@@ -1,15 +1,15 @@
-import { axios, Request, Response } from 'src/app/config';
+import { axios, Response } from 'src/shared/api';
 
 const UPLOAD_FILE_ROUTE = 'files';
 
 type UploadFileProps = { file: File; name: string };
 
-type UploadFile = Request<UploadFileProps>;
+type uploadFileResponse = { message: string; ok: boolean };
 
-export const uploadFileRequest: UploadFile = async ({ file, name }) => {
+export const uploadFileRequest = async ({ file, name }: UploadFileProps) => {
   const formData = new FormData();
   formData.append('name', name);
   formData.append(name, file);
-  const response = await axios.post<Response>(UPLOAD_FILE_ROUTE, formData);
+  const response = await axios.post<Response<uploadFileResponse>>(UPLOAD_FILE_ROUTE, formData);
   return response.data;
 };

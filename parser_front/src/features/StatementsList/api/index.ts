@@ -1,4 +1,4 @@
-import { axios, Response } from 'src/app/config';
+import { axios, Response } from 'src/shared/api';
 
 const GET_STATEMENTS_ROUTE = 'statements';
 

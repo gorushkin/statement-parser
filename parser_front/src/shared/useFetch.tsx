@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { Request } from 'src/app/config';
+import { Request } from 'src/shared/api';
 
 class ApiError extends Error {
   constructor(message: string) {
@@ -25,15 +25,19 @@ type CallBack<K> = (args: { data: K; message: string }) => void;
 
 export type UseFetchParams<K> = {
   init: K;
-  onError: CallBack<K>;
-  onSuccess: CallBack<K>;
+  onError?: CallBack<K>;
+  onSuccess?: CallBack<K>;
 };
 
 type UseFetch = <T, K>(cb: Request<T, K>, params: UseFetchParams<K>) => UseFetchResult<T, K>;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export const useFetch: UseFetch = <T, K>(cb: Request<T, K>, params: UseFetchParams<K>) => {
-  const initValue = useMemo(() => params?.init ?? ({} as K), [params?.init]);
+export const useFetch: UseFetch = <T, K>(
+  cb: Request<T, K>,
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  { init = {} as K, onError = () => {}, onSuccess = () => {} }: UseFetchParams<K>
+) => {
+  const initValue = useMemo(() => init ?? ({} as K), [init]);
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<K>(initValue);
   const [message, setMessage] = useState<null | string>(null);
@@ -59,18 +63,18 @@ export const useFetch: UseFetch = <T, K>(cb: Request<T, K>, params: UseFetchPara
         const result = response.data ?? initValue;
         setData(result);
         setMessage(response.message);
-        params.onSuccess({ data: result, message });
+        onSuccess({ data: result, message });
       } catch (error) {
         setData(initValue);
         setMessage(null);
         const message = error instanceof ApiError ? error.message : DEFAULT_ERROR_MESSAGE;
-        params.onError({ data: initValue, message });
+        onError({ data: initValue, message });
         setError(message);
       } finally {
         setIsLoading(false);
       }
     },
-    [cb, initValue, params]
+    [cb, initValue, onError, onSuccess]
   );
 
   return [{ data, error, handleReset, isLoading, message }, fetchData];
