@@ -1,12 +1,17 @@
 .layout {
   display: flex;
   align-items: stretch;
+  flex-direction: column;
 }
 
 .content {
   position: relative;
   display: flex;
   width: 100%;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  flex-grow: 1;
 }
 
 .alert {

@@ -4,14 +4,12 @@ import { FileUploader } from 'src/widgets/FileUploader';
 
 import style from './UploadFilePage.module.scss';
 
-const UploadFilePage: FC = () => {
-  return (
-    <Box className={style.pageContentWrapper}>
-      <Box className={style.contentWrapper}>
-        <FileUploader />
-      </Box>
+const UploadFilePage: FC = () => (
+  <Box className={style.pageContentWrapper}>
+    <Box className={style.contentWrapper}>
+      <FileUploader />
     </Box>
-  );
-};
+  </Box>
+);
 
 export { UploadFilePage };
