@@ -24,18 +24,18 @@ const DEFAULT_ERROR_MESSAGE = 'Your action could not be completed. Please try ag
 type CallBack<K> = (args: { data: K; message: string }) => void;
 
 export type UseFetchParams<K> = {
-  init: K;
+  init?: K;
   onError?: CallBack<K>;
   onSuccess?: CallBack<K>;
 };
 
-type UseFetch = <T, K>(cb: Request<T, K>, params: UseFetchParams<K>) => UseFetchResult<T, K>;
+type UseFetch = <T, K>(cb: Request<T, K>, params?: Partial<UseFetchParams<K>>) => UseFetchResult<T, K>;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const useFetch: UseFetch = <T, K>(
   cb: Request<T, K>,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  { init = {} as K, onError = () => {}, onSuccess = () => {} }: UseFetchParams<K>
+  { init = {} as K, onError = () => {}, onSuccess = () => {} }: UseFetchParams<K> = {}
 ) => {
   const initValue = useMemo(() => init ?? ({} as K), [init]);
   const [isLoading, setIsLoading] = useState(false);
