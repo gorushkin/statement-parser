@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { notificationStore, Status } from 'src/features/Notifications';
+import { notificationStore, Status } from 'src/entities/notifications';
 
 export const useNotify = () => {
   const addNotify = useCallback(({ message, status }: { message: string; status: Status }) => {

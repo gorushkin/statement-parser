@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import { FC } from 'react';
 
 import { notificationStore } from '../index';
-import styles from './Notifications.module.scss';
+import styles from './styles.module.scss';
 
 const Notifications: FC = observer(() => {
   const { notifications } = notificationStore;
