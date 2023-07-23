@@ -43,8 +43,8 @@ export const getStatements = async (_req: Request, res: Response) => {
 export const getStatement = async (req: Request, res: Response) => {
   const { name } = req.params;
   const result = await db.getStatement(name);
-  if (result.ok) return res.status(200).send({ data: result.data });
-  res.status(400).send({ error: result.error });
+  if (result.ok) return res.status(200).send({ data: result.data, ok: true });
+  res.status(400).send({ error: result.error, ok: false });
 };
 
 export const uploadStatement = async (req: Request, res: Response) => {
