@@ -1,6 +1,6 @@
 import { Box } from '@chakra-ui/react';
 import { FC } from 'react';
-import { Notifications } from 'src/features/Notifications';
+import { Notifications } from 'src/entities/notifications';
 import { cn } from 'src/shared/utils';
 
 import styles from './Notifications.module.scss';

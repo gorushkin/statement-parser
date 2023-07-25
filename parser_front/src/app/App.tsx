@@ -10,7 +10,7 @@ import style from './App.module.scss';
 const App: FC = () => (
   <Box as="main" className={style.layout} minH={'100vh'}>
     <Navbar />
-    <Container className={style.content} maxW="container.lg" p="4">
+    <Container className={style.content} maxW="100%" p="4">
       <Alert classNames={style.alert} />
       <Routes>
         {routes.map((route) => (
