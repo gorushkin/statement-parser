@@ -214,11 +214,14 @@ export class DataBase {
     }
   }
 
-  async getStatement(name: string): Promise<DBResult<Transaction[]>> {
+  async getStatement(
+    name: string
+  ): Promise<DBResult<{ name: string; transactions: Transaction[] }>> {
     const transactionPath = path.join(this.transactionsPath, `${name}.json`);
     try {
       const buffer = await fs.readFile(transactionPath);
-      const data: Transaction[] = JSON.parse(buffer.toString());
+      const parsedData: { transactions: Transaction[] } = JSON.parse(buffer.toString());
+      const data = { transactions: parsedData.transactions, name };
       return { data, ok: true };
     } catch (error) {
       const message = 'The filename is not correct';
