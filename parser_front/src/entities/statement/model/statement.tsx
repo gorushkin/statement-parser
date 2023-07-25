@@ -19,10 +19,12 @@ type Transaction = {
 type Transactions = Transaction[];
 
 export class Statement {
+  title: string;
   transactions: Transactions;
 
   constructor() {
     makeAutoObservable(this);
     this.transactions = [];
+    this.title = '';
   }
 }

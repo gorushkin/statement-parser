@@ -1,1 +1,1 @@
-export { StatementTable } from './statement-table';
+export { StatementTable } from './StatementTable/StatementTable';

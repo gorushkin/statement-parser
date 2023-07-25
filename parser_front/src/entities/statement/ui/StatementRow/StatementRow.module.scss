@@ -1,0 +1,12 @@
+.tableRow {
+  cursor: pointer;
+
+  td {
+    white-space: normal;
+    padding: 10px;
+
+    &:hover {
+      background: RGBA(0, 0, 0, 0.16);
+    }
+  }
+}

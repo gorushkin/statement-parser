@@ -1,7 +1,7 @@
 import { instance as axios } from './base';
 import { Response, Transaction } from './models';
 
-export type GetStatementResponse = { transactions: Transaction[] };
+export type GetStatementResponse = { name: string; transactions: Transaction[] };
 
 const GET_STATEMENT_ROUTE = 'statements';
 
