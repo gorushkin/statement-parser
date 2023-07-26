@@ -17,10 +17,12 @@ export const getStatementsRequest = async () => {
   return response.data;
 };
 
-export const uploadFileRequest = async ({ file, name }: UploadFileProps) => {
+export const uploadFileRequest = async ({ currencies: { from, to }, file, name }: UploadFileProps) => {
   const formData = new FormData();
   formData.append('name', name);
   formData.append(name, file);
+  formData.append('from', from);
+  formData.append('to', to);
   const response = await instance.post<ApiUploadFileResponse>(apiUrls.file, formData);
   return response.data;
 };

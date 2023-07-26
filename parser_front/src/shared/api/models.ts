@@ -18,9 +18,17 @@ export type Transaction = {
   transactionDate: string;
 };
 
+export enum Currencies {
+  RUB = 'RUB',
+  TRY = 'TRY',
+  USD = 'USD',
+}
+
+export type CurrencyInfo = { from: Currencies; to: Currencies };
+
 export type Transactions = Transaction[];
 
-export type UploadFileProps = { file: File; name: string };
+export type UploadFileProps = { currencies: CurrencyInfo; file: File; name: string };
 export type ApiUploadFileResponse = Response<null>;
 
 export type GetStatementsResponse = string[];

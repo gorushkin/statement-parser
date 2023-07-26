@@ -1,18 +1,21 @@
 import { Box, Button, Input, Text } from '@chakra-ui/react';
-import { ChangeEvent, FC, FormEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, FC, FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { Currencies } from 'src/shared/api/models';
 import { uploadFileRequest } from 'src/shared/api/statement';
 import { useFetch } from 'src/shared/useFetch';
 import { Payload } from 'src/shared/useFetch/types';
 import { useNotify } from 'src/shared/useNotify';
 import { cn } from 'src/shared/utils';
 
+import { CurrencySelector } from '../CurrencySelector';
+import { useFileDrop } from '../lib/';
+import { ConvertDirection, CurrencyState, FileInfo } from '../types';
 import styles from './FileForm.module.scss';
-import { FileInfo } from './types';
-import { useFileDrop } from './useFileDrop';
 
 const FileForm: FC = () => {
   const [fileInfo, setFileInfo] = useState<FileInfo | null>(null);
   const [name, setName] = useState('');
+  const [currencies, setCurrencies] = useState<CurrencyState>({ from: Currencies.TRY, to: Currencies.RUB });
   const [isFormValid, setIsFromValid] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textInputRef = useRef<HTMLInputElement>(null);
@@ -57,7 +60,7 @@ const FileForm: FC = () => {
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!fileInfo) return;
-    void fetchData({ file: fileInfo.file, name });
+    void fetchData({ currencies, file: fileInfo.file, name });
   };
 
   const handleAddFileButtonClick = () => {
@@ -81,6 +84,13 @@ const FileForm: FC = () => {
     textInputRef.current?.focus();
   }, [fileInfo]);
 
+  const handleCurrenciesChange = useCallback(
+    ({ direction, value }: { direction: ConvertDirection; value: Currencies }) => {
+      setCurrencies((state) => ({ ...state, [direction]: value }));
+    },
+    []
+  );
+
   const isResetButtonDisabled = !fileInfo;
   const isUploadButtonDisabled = !isFormValid || !!error;
 
@@ -93,7 +103,7 @@ const FileForm: FC = () => {
         onDrop={handleFileDrop}
         title={fileInfo?.name ? fileInfo?.name : ''}
       >
-        {fileInfo?.name && (
+        {!!fileInfo?.name && (
           <Box className={styles.textWrapper} isTruncated>
             <Text className={styles.filename}>{fileInfo.name}</Text>
             <Input
@@ -104,6 +114,7 @@ const FileForm: FC = () => {
               type="text"
               value={name}
             />
+            <CurrencySelector onChange={handleCurrenciesChange} values={currencies} />
           </Box>
         )}
         {!fileInfo && (
