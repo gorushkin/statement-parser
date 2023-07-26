@@ -4,18 +4,24 @@ import fs from 'fs/promises';
 import { AppError, BaseError, ERROR_PLACES } from '../../errors/error';
 import { logger } from '../../logger';
 import { db } from '../../dataBase';
-import { FormattedRequest, StatementPayload } from './types';
+import { FormattedRequest, File, StatementPayload, FileWithoutExt } from './types';
 import { getBody } from '../utils';
 const parser = new Parser();
 
 export const getData = (data: Buffer) => parser.parse(data);
+
+const getFileDate = (fileInfo: File): FileWithoutExt => {
+  if ('xlsx' in fileInfo) return fileInfo?.xlsx;
+  if ('csv' in fileInfo) return fileInfo?.csv;
+  return fileInfo;
+};
 
 export const uploadFile = async (req: Request, res: Response) => {
   try {
     const formattedRequest = req as unknown as FormattedRequest;
     const files = Object.values(formattedRequest.files);
     const fileInfo = files[0];
-    const { fieldName, path } = fileInfo;
+    const { fieldName, path } = getFileDate(fileInfo);
     const fileContent = await fs.readFile(path);
     const parsedData = getData(fileContent);
     const { error, ok } = await db.generateStatement(parsedData.transactions, fieldName);
