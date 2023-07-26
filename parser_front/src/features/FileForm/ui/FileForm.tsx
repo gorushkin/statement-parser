@@ -1,6 +1,7 @@
 import { Box, Button, Container, Input, Text } from '@chakra-ui/react';
-import { ChangeEvent, DragEvent, FC, useRef, useState } from 'react';
+import { ChangeEvent, DragEvent, FC, FormEvent, useEffect, useRef, useState } from 'react';
 import { useFetch } from 'src/shared/useFetch';
+import { useNotify } from 'src/shared/useNotify';
 import { cn } from 'src/shared/utils';
 
 import { uploadFileRequest } from '../api';
@@ -15,12 +16,22 @@ type FileInfo = {
 const FileForm: FC = () => {
   const [fileInfo, setFileInfo] = useState<FileInfo | null>(null);
   const [isHover, setIsHover] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const textInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState('');
+
+  const { addErrorMessage, addSuccessMessage } = useNotify();
 
   const [isFormValid, setIsFromValid] = useState(false);
 
-  const [{ error, handleReset }, fetchData] = useFetch(uploadFileRequest);
+  const [{ error, handleReset }, fetchData] = useFetch(uploadFileRequest, {
+    onError: (e) => {
+      addErrorMessage({ message: e.message });
+      setIsFromValid(true);
+      handleReset();
+    },
+    onSuccess: (e) => addSuccessMessage({ message: e.message }),
+  });
 
   const isResetButtonDisabled = !fileInfo;
   const isUploadButtonDisabled = !isFormValid || !!error;
@@ -29,6 +40,8 @@ const FileForm: FC = () => {
     for (const file of files) {
       const { name, size } = file;
       setFileInfo({ file, name, size });
+      setName(name);
+      setIsFromValid(!!name);
     }
   };
 
@@ -52,20 +65,19 @@ const FileForm: FC = () => {
   const handleResetButtonClick = () => {
     setFileInfo(null);
     setIsFromValid(false);
-    if (inputRef.current) {
-      inputRef.current.files = null;
-    }
+    if (fileInputRef.current) fileInputRef.current.files = null;
     handleReset();
   };
 
-  const handleStartButtonClick = () => {
+  const handleStartButtonClick = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (!fileInfo) return;
     void fetchData({ file: fileInfo.file, name });
   };
 
   const handleAddFileButtonClick = () => {
-    if (!inputRef.current) return;
-    inputRef.current.click();
+    if (!fileInputRef.current) return;
+    fileInputRef.current.click();
   };
 
   const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -80,51 +92,72 @@ const FileForm: FC = () => {
     setIsFromValid(!!trimmedValue && !!fileInfo?.name);
   };
 
+  useEffect(() => {
+    textInputRef.current?.select();
+    textInputRef.current?.focus();
+  }, [fileInfo]);
+
   return (
     <Container>
-      <Box
-        className={cn(styles.form, isHover && styles.formHover, isFormValid && styles.formValid)}
-        onDragLeave={handleFileDragLeave}
-        onDragOver={handleFileDragOver}
-        onDrop={handleFileDrop}
-        title={fileInfo?.name ? fileInfo?.name : ''}
-      >
-        {fileInfo?.name && (
-          <Box className={styles.textWrapper} isTruncated>
-            <Text className={styles.filename}>{fileInfo.name}</Text>
-            <Input className={styles.input} name="name" onChange={handleInputChange} type="text" />
-          </Box>
-        )}
-        {!fileInfo && (
-          <Text textAlign={'center'}>
-            Drag'n'drop your statement or{' '}
-            <Text as={'button'} className={styles.link} onClick={handleAddFileButtonClick}>
-              click here
+      <form onSubmit={(e) => handleStartButtonClick(e)}>
+        <Box
+          className={cn(styles.form, isHover && styles.formHover, isFormValid && styles.formValid)}
+          onDragLeave={handleFileDragLeave}
+          onDragOver={handleFileDragOver}
+          onDrop={handleFileDrop}
+          title={fileInfo?.name ? fileInfo?.name : ''}
+        >
+          {fileInfo?.name && (
+            <Box className={styles.textWrapper} isTruncated>
+              <Text className={styles.filename}>{fileInfo.name}</Text>
+              <Input
+                className={styles.input}
+                name="name"
+                onChange={handleInputChange}
+                ref={textInputRef}
+                type="text"
+                value={name}
+              />
+            </Box>
+          )}
+          {!fileInfo && (
+            <Text textAlign={'center'}>
+              Drag'n'drop your statement or{' '}
+              <Text as={'button'} className={styles.link} onClick={handleAddFileButtonClick} type="button">
+                click here
+              </Text>
             </Text>
-          </Text>
-        )}
-        <input hidden={true} name="file" onChange={handleFileInputChange} ref={inputRef} type="file" />
-      </Box>
-      <Box className={styles.buttonGroup}>
-        <Button
-          background={'red.400'}
-          isDisabled={isResetButtonDisabled}
-          onClick={handleResetButtonClick}
-          size={'lg'}
-          variant={'outline'}
-        >
-          Reset
-        </Button>
-        <Button
-          background={'green.400'}
-          isDisabled={isUploadButtonDisabled}
-          onClick={handleStartButtonClick}
-          size={'lg'}
-          variant={'solid'}
-        >
-          Upload
-        </Button>
-      </Box>
+          )}
+          <input
+            accept=".csv, .xls"
+            hidden={true}
+            name="file"
+            onChange={handleFileInputChange}
+            ref={fileInputRef}
+            type="file"
+          />
+        </Box>
+        <Box className={styles.buttonGroup}>
+          <Button
+            background={'red.400'}
+            isDisabled={isResetButtonDisabled}
+            onClick={handleResetButtonClick}
+            size={'lg'}
+            variant={'outline'}
+          >
+            Reset
+          </Button>
+          <Button
+            background={'green.400'}
+            isDisabled={isUploadButtonDisabled}
+            size={'lg'}
+            type="submit"
+            variant={'solid'}
+          >
+            Upload
+          </Button>
+        </Box>
+      </form>
     </Container>
   );
 };
