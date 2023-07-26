@@ -60,7 +60,6 @@ export const useFetch: UseFetch = <T, K>(
         if (!response.ok) throw new ApiError(response.error);
         const message = response.message ?? DEFAULT_SUCCESS_MESSAGE;
         const result = response.data ?? initValue;
-        console.log('result: ', result);
         setData(result);
         setMessage(response.message);
         onSuccess({ data: result, message });

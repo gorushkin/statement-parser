@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { statementApi } from 'src/shared/api';
 import { ROUTE } from 'src/shared/routes';
+import { Spinner } from 'src/shared/Spinner';
 import { useFetch } from 'src/shared/useFetch';
 import { useNotify } from 'src/shared/useNotify';
 
@@ -15,7 +16,7 @@ import styles from './StatementTable.module.scss';
 export const StatementTable = observer(() => {
   const { addErrorMessage } = useNotify();
 
-  const [, fetchData] = useFetch(statementApi.getStatementRequest, {
+  const [{ isLoading }, fetchData] = useFetch(statementApi.getStatementRequest, {
     init: { name: '', transactions: [] },
     onError: addErrorMessage,
     onSuccess: (res) => {
@@ -32,6 +33,8 @@ export const StatementTable = observer(() => {
   }, [fetchData, statementId]);
 
   if (!statementId) navigate(ROUTE.STATEMENTS);
+
+  if (isLoading) return <Spinner center size="xl" />;
 
   return (
     <>
