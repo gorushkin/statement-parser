@@ -20,6 +20,11 @@ export type Transaction = {
 
 export type Transactions = Transaction[];
 
+export type UploadFileProps = { file: File; name: string };
+export type ApiUploadFileResponse = Response<null>;
+
 export type GetStatementsResponse = string[];
+export type ApiStatementsResponse = Response<GetStatementsResponse>;
 
 export type GetStatementResponse = { name: string; transactions: Transaction[] };
+export type ApiStatementResponse = Response<GetStatementResponse>;

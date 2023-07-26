@@ -1,10 +1,11 @@
 import { Box, Button, Container, Input, Text } from '@chakra-ui/react';
 import { ChangeEvent, DragEvent, FC, FormEvent, useEffect, useRef, useState } from 'react';
+import { uploadFileRequest } from 'src/shared/api/statement';
 import { useFetch } from 'src/shared/useFetch';
+import { Payload } from 'src/shared/useFetch/types';
 import { useNotify } from 'src/shared/useNotify';
 import { cn } from 'src/shared/utils';
 
-import { uploadFileRequest } from '../api';
 import styles from './FileForm.module.scss';
 
 type FileInfo = {
@@ -24,13 +25,18 @@ const FileForm: FC = () => {
 
   const [isFormValid, setIsFromValid] = useState(false);
 
+  const handleUploadSuccess = (e: Payload<null>) => {
+    addSuccessMessage({ message: e.message });
+    handleFormReset();
+  };
+
   const [{ error, handleReset }, fetchData] = useFetch(uploadFileRequest, {
     onError: (e) => {
       addErrorMessage({ message: e.message });
       setIsFromValid(true);
       handleReset();
     },
-    onSuccess: (e) => addSuccessMessage({ message: e.message }),
+    onSuccess: handleUploadSuccess,
   });
 
   const isResetButtonDisabled = !fileInfo;
@@ -62,7 +68,7 @@ const FileForm: FC = () => {
     setIsHover(false);
   };
 
-  const handleResetButtonClick = () => {
+  const handleFormReset = () => {
     setFileInfo(null);
     setIsFromValid(false);
     if (fileInputRef.current) fileInputRef.current.files = null;
@@ -141,7 +147,7 @@ const FileForm: FC = () => {
           <Button
             background={'red.400'}
             isDisabled={isResetButtonDisabled}
-            onClick={handleResetButtonClick}
+            onClick={handleFormReset}
             size={'lg'}
             variant={'outline'}
           >

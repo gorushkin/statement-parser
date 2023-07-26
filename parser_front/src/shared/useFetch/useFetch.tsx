@@ -1,35 +1,16 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Request } from 'src/shared/api';
 
+import { UseFetch, UseFetchParams } from './types';
+
 class ApiError extends Error {
   constructor(message: string) {
     super(message);
   }
 }
 
-type UseFetchResult<T, K> = [
-  {
-    data: K;
-    error: null | string;
-    handleReset: () => void;
-    isLoading: boolean;
-    message: null | string;
-  },
-  (args?: T) => Promise<void>,
-];
-
 const DEFAULT_SUCCESS_MESSAGE = 'Your action has been completed successfully.';
 const DEFAULT_ERROR_MESSAGE = 'Your action could not be completed. Please try again later.';
-
-type CallBack<K> = (args: { data: K; message: string }) => void;
-
-export type UseFetchParams<K> = {
-  init?: K;
-  onError?: CallBack<K>;
-  onSuccess?: CallBack<K>;
-};
-
-type UseFetch = <T, K>(cb: Request<T, K>, params?: Partial<UseFetchParams<K>>) => UseFetchResult<T, K>;
 
 export const useFetch: UseFetch = <T, K>(
   cb: Request<T, K>,
