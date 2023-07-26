@@ -1,1 +1,1 @@
-export { StatementsList } from './ui/StatementsList';
+export { StatementsList } from './StatementsList';

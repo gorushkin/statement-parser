@@ -1,11 +1,17 @@
-import { instance as axios } from './base';
-import { Response, Transaction } from './models';
+import { instance } from './base';
+import { GetStatementResponse, GetStatementsResponse, Response } from './models';
 
-export type GetStatementResponse = { name: string; transactions: Transaction[] };
-
-const GET_STATEMENT_ROUTE = 'statements';
+const apiUrls = {
+  getStatement: 'statements',
+  getStatementByName: (name: string) => `statements/${name}`,
+};
 
 export const getStatementRequest = async ({ name }: { name: string }) => {
-  const response = await axios.get<Response<GetStatementResponse>>(`${GET_STATEMENT_ROUTE}/${name}`);
+  const response = await instance.get<Response<GetStatementResponse>>(apiUrls.getStatementByName(name));
+  return response.data;
+};
+
+export const getStatementsRequest = async () => {
+  const response = await instance.get<Response<GetStatementsResponse>>(apiUrls.getStatement);
   return response.data;
 };

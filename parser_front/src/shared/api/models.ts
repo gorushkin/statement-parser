@@ -19,3 +19,7 @@ export type Transaction = {
 };
 
 export type Transactions = Transaction[];
+
+export type GetStatementsResponse = string[];
+
+export type GetStatementResponse = { name: string; transactions: Transaction[] };
