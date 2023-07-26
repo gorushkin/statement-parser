@@ -7,7 +7,7 @@ interface FileUploaderProps {}
 
 const FileUploader: FC<FileUploaderProps> = () => {
   return (
-    <Container maxW="500px">
+    <Container maxW="700px">
       <Heading as="h1" mb="5" textAlign="center">
         Upload Statement
       </Heading>
