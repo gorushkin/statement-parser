@@ -17,3 +17,5 @@ export type Transaction = {
   rate: number;
   transactionDate: string;
 };
+
+export type Transactions = Transaction[];
