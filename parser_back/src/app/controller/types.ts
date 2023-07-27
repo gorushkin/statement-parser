@@ -4,6 +4,11 @@ export type StatementPayload = {
   name: string;
   statement: Transaction[];
 };
+export enum Currencies {
+  RUB = 'RUB',
+  TRY = 'TRY',
+  USD = 'USD',
+}
 
 export type FileWithoutExt = {
   fieldName: string;
@@ -25,6 +30,7 @@ type Csv = {
 
 export type File = Xlsx | FileWithoutExt | Csv;
 
-export interface FormattedRequest extends Request {
+export interface FormattedRequest {
   files: Record<string, File>;
+  body: { name: string; from: Currencies; to: Currencies };
 }

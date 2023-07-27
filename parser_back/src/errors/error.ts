@@ -13,6 +13,7 @@ export enum ERROR_PLACES {
   'getCurrencyValue',
   'saveStatement',
   'getXMLCurrencies',
+  'gettingCurrencies',
 }
 
 const ERROR_MESSAGES: Record<ERROR_PLACES, string> = {
@@ -22,6 +23,7 @@ const ERROR_MESSAGES: Record<ERROR_PLACES, string> = {
   [ERROR_PLACES.getCurrencyValue]: 'Something wrong with rates reading',
   [ERROR_PLACES.saveStatement]: 'The file name is not correct',
   [ERROR_PLACES.getXMLCurrencies]: 'Getting currencies was not successful',
+  [ERROR_PLACES.gettingCurrencies]: 'There is no info about currencies',
 };
 
 export class BaseError extends Error {
@@ -46,6 +48,13 @@ export class AppError extends BaseError {
   constructor(place: ERROR_PLACES, error?: unknown) {
     super(place, 500, error);
     this.name = 'AppError';
+  }
+}
+
+export class ValidationError extends BaseError {
+  constructor(place: ERROR_PLACES, error?: unknown) {
+    super(place, 403, error);
+    this.name = 'ValidationError';
   }
 }
 
