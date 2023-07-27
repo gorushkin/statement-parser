@@ -3,7 +3,7 @@ import { Transaction } from 'parser';
 import fs from 'fs/promises';
 import { DBError, ERROR_PLACES } from '../errors/error';
 import dayjs from 'dayjs';
-import { getPath, getRates, getRoundedValue } from '../helpers/until';
+import { getAbsolutePath, getRates, getRoundedValue } from '../helpers/until';
 import { Currency } from '../helpers/types';
 import { logger } from '../logger';
 import { DBResult, GroupedSummary, Rates, Summary } from './types';
@@ -17,7 +17,7 @@ export class DataBase {
   rates: Rates = {} as Rates;
 
   async init(path: string) {
-    const absolutePath = getPath(path);
+    const absolutePath = getAbsolutePath(path);
     logger.info(`Start BD init, path is "${absolutePath}"`);
     this.dbPath = join(process.cwd(), path);
     this.transactionsPath = join(this.dbPath, 'statements');

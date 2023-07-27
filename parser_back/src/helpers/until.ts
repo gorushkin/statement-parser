@@ -4,7 +4,7 @@ import { Currencies, CBRCurrencies } from './types';
 import { getXMLCurrencies } from '../api';
 import { join } from 'path';
 
-export const getPath = (target: string) => join(process.cwd(), target);
+export const getAbsolutePath = (target: string) => join(process.cwd(), target);
 
 export const makeDir = async (path: string) => {
   try {

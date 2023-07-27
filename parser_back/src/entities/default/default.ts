@@ -1,9 +1,23 @@
 import fs from 'fs/promises';
+import { ParsedPath, join, parse } from 'path';
 
 export class DefaultDB {
+  getAbsolutePath(path: string) {
+    return join(process.cwd(), path);
+  }
+
+  parse(path: string): ParsedPath {
+    return parse(path);
+  }
+
+  getPath(...paths: string[]): string {
+    return join(...paths);
+  }
+
   protected async readJSONData<T>(path: string): Promise<T> {
     try {
-      return JSON.parse(await fs.readFile(path, 'utf-8'));
+      const buffer = await fs.readFile(path, 'utf-8');
+      return JSON.parse(buffer);
     } catch (error) {
       console.log('error: ', error);
       // TODO: Добавить создание файла при его отсутсвии

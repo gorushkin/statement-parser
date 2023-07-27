@@ -10,28 +10,12 @@ type CurrencyInfo = {
 const defaultCurrency: Currency = 'TRY';
 
 export class Statement {
-  private transactions: Transaction[];
-  private currency: CurrencyInfo | null;
-  private name: string;
-  private id: string;
-  static path: string;
-
-  constructor({
-    name,
-    currency,
-    transactions,
-    id,
-  }: {
-    transactions: Transaction[];
-    name: string;
-    currency?: CurrencyInfo | null;
-    id: string;
-  }) {
-    this.currency = currency ?? null;
-    this.id = id;
-    this.name = name;
-    this.transactions = transactions;
-  }
+  constructor(
+    public id: string,
+    public transactions: Transaction[],
+    public name: string,
+    public currency: CurrencyInfo | null
+  ) {}
 
   async updateTransactions() {
     const dataWithCurrencyPromises = this.transactions.map(async (item) => {
