@@ -48,8 +48,8 @@ export const getStatements = async (_req: Request, res: Response) => {
 };
 
 export const getStatement = async (req: Request, res: Response) => {
-  const { name } = req.params;
-  const result = await statements.getStatementById(name);
+  const { id } = req.params;
+  const result = await statements.getStatementById(id);
   if (result.ok) return res.status(200).send({ data: result.data, ok: true });
   res.status(400).send({ error: result.error, ok: false });
 };

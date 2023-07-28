@@ -8,7 +8,7 @@ router.get('/', (_req, res) => {
 });
 
 router.post('/files', uploadFile);
-router.get('/statements/:name', getStatement);
+router.get('/statements/:id', getStatement);
 
 router.get('/statements', getStatements);
 

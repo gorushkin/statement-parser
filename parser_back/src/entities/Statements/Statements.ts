@@ -1,7 +1,6 @@
 import { Transaction } from 'parser';
 import { BaseDB } from '../BaseDB/BaseDB';
 import { Statement } from '../Statement';
-import fs from 'fs/promises';
 import { v4 as uuidv4 } from 'uuid';
 import { StatementType } from '../index';
 
@@ -36,7 +35,7 @@ class Statements extends BaseDB {
   async getStatementById(id: string) {
     try {
       const parsedData = await this.getItem<Statement>(`${id}.json`);
-      const data = { transactions: parsedData.transactions, id };
+      const data = { transactions: parsedData.transactions, id, name: parsedData.name };
       return { data, ok: true };
     } catch (error) {
       const message = 'The filename is not correct';
