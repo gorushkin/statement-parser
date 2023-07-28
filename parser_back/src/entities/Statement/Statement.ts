@@ -1,11 +1,6 @@
-import { Transaction } from 'parser';
-import { Currencies } from '../../app/controller/types';
-import { Currency } from '../../helpers/types';
-
-type CurrencyInfo = {
-  from: Currencies;
-  to: Currencies;
-};
+import { Currencies, Currency, rates } from '../index';
+import { Transaction } from '../../helpers/types';
+import { StatementType, currencyExchangeDirection } from './types';
 
 const defaultCurrency: Currency = 'TRY';
 
@@ -14,12 +9,17 @@ export class Statement {
     public id: string,
     public transactions: Transaction[],
     public name: string,
-    public currency: CurrencyInfo | null
+    public currency: currencyExchangeDirection | null
   ) {}
 
   async updateTransactions() {
     const dataWithCurrencyPromises = this.transactions.map(async (item) => {
-      const rate = 15;
+      const currentRate = await rates.getRate(
+        item.processDate,
+        this.currency?.from || Currencies.USD,
+        this.currency?.to || Currencies.RUB
+      );
+      const rate = currentRate.value;
       // const rate = await this.getCurrencyValue(this.formatDate(item.processDate), 'TRY');
       const convertedAmount = 5;
       // const convertedAmount = getRoundedValue(rate * item.amount);
@@ -37,11 +37,12 @@ export class Statement {
     this.transactions = await Promise.all(dataWithCurrencyPromises);
   }
 
-  getSerializedData() {
-    return JSON.stringify(
-      { transactions: this.transactions, id: this.id, currency: this.currency, name: this.name },
-      null,
-      2
-    );
+  getStatement(): StatementType {
+    return {
+      transactions: this.transactions,
+      id: this.id,
+      currency: this.currency,
+      name: this.name,
+    };
   }
 }

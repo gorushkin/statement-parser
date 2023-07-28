@@ -1,25 +1,25 @@
 import { Transaction } from 'parser';
-import { DefaultDB } from '../Default/Default';
+import { BaseDB } from '../BaseDB/BaseDB';
 import { Statement } from '../Statement';
 import fs from 'fs/promises';
 import { v4 as uuidv4 } from 'uuid';
+import { StatementType } from '../index';
 
-class Statements extends DefaultDB {
+class Statements extends BaseDB {
   init(path: string) {
-    this.setPath(path, 'Statements');
+    this.setPath(path, 'statements');
   }
 
-  async saveStatement(id: string, serializedStatement: string) {
-    const filePath = this.getPath(this.path, id);
-    await this.writeJSONData(`${filePath}.json`, serializedStatement);
+  async saveStatement(id: string, serializedStatement: StatementType) {
+    await this.writeJSONData(`${id}.json`, serializedStatement);
   }
 
   async createStatement(transactions: Transaction[], name: string) {
     const id = uuidv4();
     const statement = new Statement(id, transactions, name, null);
     await statement.updateTransactions();
-    const serializedStatement = statement.getSerializedData();
-    await this.saveStatement(id, serializedStatement);
+    const statementData = statement.getStatement();
+    await this.saveStatement(id, statementData);
     return { error: null, ok: true };
   }
 
@@ -35,9 +35,8 @@ class Statements extends DefaultDB {
   }
 
   async getStatementById(id: string) {
-    const transactionPath = this.getPath(this.path, `${id}.json`);
     try {
-      const parsedData = await this.readJSONData<Statement>(transactionPath);
+      const parsedData = await this.readJSONData<Statement>(`${id}.json`);
       const data = { transactions: parsedData.transactions, id };
       return { data, ok: true };
     } catch (error) {

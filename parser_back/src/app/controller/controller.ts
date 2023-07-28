@@ -4,8 +4,9 @@ import fs from 'fs/promises';
 import { AppError, BaseError, ERROR_PLACES, ValidationError } from '../../errors/error';
 import { logger } from '../../logger';
 import { statements } from '../../entities';
-import { FormattedRequest, File, StatementPayload, FileWithoutExt } from './types';
 import { getBody } from '../utils';
+import { StatementPayload } from '../../helpers/types';
+import { FileWithoutExt, FormattedRequest, File } from './types';
 const parser = new Parser();
 
 export const getData = (data: Buffer) => parser.parse(data);
@@ -27,14 +28,12 @@ export const uploadFile = async (req: Request, res: Response) => {
     const fileContent = await fs.readFile(path);
     const parsedData = getData(fileContent);
     const { error, ok } = await statements.createStatement(parsedData.transactions, fieldName);
-    if (ok) {
-      logger.info(`File "${fieldName}" was successfully uploaded`);
-      return res.status(200).send({
-        message: `File "${fieldName}" was uploaded and will be available in a few minutes`,
-        ok: true,
-      });
-    }
-    throw new AppError(ERROR_PLACES.uploadFile, error);
+    if (!ok) throw new AppError(ERROR_PLACES.uploadFile, error);
+    logger.info(`File "${fieldName}" was successfully uploaded`);
+    return res.status(200).send({
+      message: `File "${fieldName}" was uploaded and will be available in a few minutes`,
+      ok: true,
+    });
   } catch (error) {
     const message = error instanceof BaseError ? error.userMessage : 'Something went wrong';
     logger.error(`There is an error with file uploading with text/n${message}`);

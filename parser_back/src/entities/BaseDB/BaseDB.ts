@@ -2,22 +2,18 @@ import fs from 'fs/promises';
 import { ParsedPath, join, parse } from 'path';
 import { Logger, logger } from '../../logger';
 
-export class DefaultDB {
+export class BaseDB {
   protected path: string;
-  protected logger: Logger;
+  protected logger: Logger = logger;
 
-  constructor() {
-    this.logger = logger;
+  protected setPath(path: string, name: string) {
+    const absolutePath = this.getAbsolutePath(path, name);
+    this.logger.info(`${name} init, path is "${absolutePath}"`);
+    this.path = absolutePath;
   }
 
-  protected setPath(path: string, name?: 'Rates' | 'Statements') {
-    const absolutePath = this.getAbsolutePath(path);
-    if (name) this.logger.info(`${name} init, path is "${absolutePath}"`);
-    this.path = this.getPath(absolutePath, 'statements');
-  }
-
-  protected getAbsolutePath(path: string) {
-    return join(process.cwd(), path);
+  protected getAbsolutePath(parentPath: string, path: string) {
+    return join(process.cwd(), parentPath, path);
   }
 
   protected parse(path: string): ParsedPath {
@@ -25,10 +21,11 @@ export class DefaultDB {
   }
 
   protected getPath(...paths: string[]): string {
-    return join(...paths);
+    return join(this.path, ...paths);
   }
 
-  protected async readJSONData<T>(path: string): Promise<T> {
+  protected async readJSONData<T>(filename: string): Promise<T> {
+    const path = this.getPath(filename);
     try {
       const buffer = await fs.readFile(path, 'utf-8');
       return JSON.parse(buffer);
@@ -40,10 +37,17 @@ export class DefaultDB {
     }
   }
 
-  protected async writeJSONData(path: string, data: string) {
+  private getSerializedData<T>(data: T) {
+    return JSON.stringify(data, null, 2);
+  }
+
+  protected async writeJSONData<T>(path: string, data: T) {
+    const fullPath = this.getPath(path);
+    const serializedData = this.getSerializedData(data);
     try {
-      await fs.writeFile(path, data);
+      await fs.writeFile(fullPath, serializedData);
     } catch (error) {
+      console.log('error: ', error);
       // TODO: add custom error
       throw new Error('writeJSONData');
     }

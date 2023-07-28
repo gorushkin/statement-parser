@@ -1,14 +1,4 @@
-import { Transaction } from 'parser';
-
-export type StatementPayload = {
-  name: string;
-  statement: Transaction[];
-};
-export enum Currencies {
-  RUB = 'RUB',
-  TRY = 'TRY',
-  USD = 'USD',
-}
+import { Currencies } from '../../entities';
 
 export type FileWithoutExt = {
   fieldName: string;

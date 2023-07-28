@@ -7,7 +7,7 @@ import { DB_PATH, PORT, TEMP_FILES_PATH } from './helpers/config';
 
 const init = async (app: Express, tempFilesPath: string, port: number, dbPath: string) => {
   statements.init(dbPath);
-  rates.init(dbPath);
+  await rates.init(dbPath);
   await checkFilesPath(tempFilesPath);
   logger.info(`Temp files dir exist`);
 

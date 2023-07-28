@@ -1,8 +1,9 @@
 import fs from 'fs/promises';
 import convert from 'xml-js';
-import { Currencies, CBRCurrencies } from './types';
+import { CBRCurrencies } from './types';
 import { getXMLCurrencies } from '../api';
 import { join } from 'path';
+import { CurrencyRecord } from '../entities/';
 
 export const getAbsolutePath = (target: string) => join(process.cwd(), target);
 
@@ -36,7 +37,7 @@ export const getRates = async (date: string) => {
   const xmlCurrencies = await getXMLCurrencies(date);
   const convertedCurrencies = convert.xml2js(xmlCurrencies, { compact: true });
   const cbrCurrencies = convertedCurrencies as CBRCurrencies;
-  const currencies = cbrCurrencies.ValCurs.Valute.reduce<Currencies>(
+  const currencies = cbrCurrencies.ValCurs.Valute.reduce<CurrencyRecord>(
     (acc, item) => ({
       ...acc,
       [item.CharCode._text]: {
@@ -47,7 +48,7 @@ export const getRates = async (date: string) => {
         code: item.CharCode._text,
       },
     }),
-    {} as Currencies
+    {} as CurrencyRecord
   );
   return currencies;
 };
