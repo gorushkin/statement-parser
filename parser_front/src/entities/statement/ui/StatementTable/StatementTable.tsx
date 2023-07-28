@@ -11,6 +11,7 @@ import { useNotify } from 'src/shared/useNotify';
 import { statement } from '../../model';
 import { StatementHead } from '../StatementHead';
 import { StatementRow } from '../StatementRow';
+import { StatementSummary } from '../StatementSummary';
 import styles from './StatementTable.module.scss';
 
 export const StatementTable = observer(() => {
@@ -41,6 +42,7 @@ export const StatementTable = observer(() => {
       <Heading as="h1" mb="5" textAlign="center">
         {statement.title}
       </Heading>
+      <StatementSummary summary={statement.summary} />
       <TableContainer className={styles.tableContainer}>
         <Table className={styles.table} variant="simple">
           <StatementHead />
