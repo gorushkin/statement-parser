@@ -1,5 +1,14 @@
+import { AxiosError } from 'axios';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Request } from 'src/shared/api';
+
+import { UseFetch, UseFetchParams } from './types';
+
+const getErrorMessage = (error: unknown) => {
+  if (error instanceof AxiosError) return (error.response?.data as { error: string }).error;
+  if (error instanceof ApiError) return error.message;
+  return DEFAULT_ERROR_MESSAGE;
+};
 
 class ApiError extends Error {
   constructor(message: string) {
@@ -7,29 +16,8 @@ class ApiError extends Error {
   }
 }
 
-type UseFetchResult<T, K> = [
-  {
-    data: K;
-    error: null | string;
-    handleReset: () => void;
-    isLoading: boolean;
-    message: null | string;
-  },
-  (args?: T) => Promise<void>,
-];
-
 const DEFAULT_SUCCESS_MESSAGE = 'Your action has been completed successfully.';
 const DEFAULT_ERROR_MESSAGE = 'Your action could not be completed. Please try again later.';
-
-type CallBack<K> = (args: { data: K; message: string }) => void;
-
-export type UseFetchParams<K> = {
-  init?: K;
-  onError?: CallBack<K>;
-  onSuccess?: CallBack<K>;
-};
-
-type UseFetch = <T, K>(cb: Request<T, K>, params?: Partial<UseFetchParams<K>>) => UseFetchResult<T, K>;
 
 export const useFetch: UseFetch = <T, K>(
   cb: Request<T, K>,
@@ -66,7 +54,7 @@ export const useFetch: UseFetch = <T, K>(
       } catch (error) {
         setData(initValue);
         setMessage(null);
-        const message = error instanceof ApiError ? error.message : DEFAULT_ERROR_MESSAGE;
+        const message = getErrorMessage(error);
         onError({ data: initValue, message });
         setError(message);
       } finally {

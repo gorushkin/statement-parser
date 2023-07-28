@@ -1,11 +1,11 @@
 import { Button, Table, TableCaption, TableContainer, Tbody, Td, Tr } from '@chakra-ui/react';
 import { FC, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getStatementsRequest } from 'src/shared/api/statement';
 import { ROUTE } from 'src/shared/routes';
 import { useFetch } from 'src/shared/useFetch';
 import { useNotify } from 'src/shared/useNotify';
 
-import { getStatementsRequest } from '../api';
 import styles from './StatementsList.module.scss';
 
 const StatementsList: FC = () => {

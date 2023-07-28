@@ -1,11 +1,6 @@
-import { Transaction } from 'parser';
+import { Currencies } from '../../entities';
 
-export type StatementPayload = {
-  name: string;
-  statement: Transaction[];
-};
-
-type File = {
+export type FileWithoutExt = {
   fieldName: string;
   originalFilename: string;
   path: string;
@@ -13,8 +8,19 @@ type File = {
   name: string;
   type: string;
   headers: Record<string, string>;
+} & object;
+
+type Xlsx = {
+  xlsx: FileWithoutExt;
 };
 
-export interface FormattedRequest extends Request {
+type Csv = {
+  csv: FileWithoutExt;
+};
+
+export type File = Xlsx | FileWithoutExt | Csv;
+
+export interface FormattedRequest {
   files: Record<string, File>;
+  body: { name: string; from: Currencies; to: Currencies };
 }

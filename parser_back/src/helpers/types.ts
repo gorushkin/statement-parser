@@ -1,5 +1,7 @@
-export type Currency = 'TRY' | 'USD' | 'RUB';
+import { Transaction as ParserTransaction } from 'parser';
+import { Currency } from '../entities';
 
+export type Transaction = ParserTransaction;
 export interface CBRCurrencies {
   ValCurs: {
     Valute: {
@@ -19,13 +21,7 @@ export interface CBRCurrencies {
   };
 }
 
-type CurrencyInfo = {
+export type StatementPayload = {
   name: string;
-  value: number;
-  responseNominal: number;
-  code: Currency;
-  responseValue: number;
-  convertedValue: number;
+  statement: Transaction[];
 };
-
-export type Currencies = Record<Currency, CurrencyInfo>;
