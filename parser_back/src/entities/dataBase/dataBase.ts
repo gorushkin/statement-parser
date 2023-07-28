@@ -6,8 +6,8 @@ import fs from 'fs/promises';
 import { v4 as uuidv4 } from 'uuid';
 
 class DataBase extends DefaultDB {
-  statementsPath: string;
-  path: string;
+  private statementsPath: string;
+  private path: string;
 
   init(path: string) {
     const absolutePath = super.getAbsolutePath(path);

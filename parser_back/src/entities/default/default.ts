@@ -2,15 +2,15 @@ import fs from 'fs/promises';
 import { ParsedPath, join, parse } from 'path';
 
 export class DefaultDB {
-  getAbsolutePath(path: string) {
+  protected getAbsolutePath(path: string) {
     return join(process.cwd(), path);
   }
 
-  parse(path: string): ParsedPath {
+  protected parse(path: string): ParsedPath {
     return parse(path);
   }
 
-  getPath(...paths: string[]): string {
+  protected getPath(...paths: string[]): string {
     return join(...paths);
   }
 
