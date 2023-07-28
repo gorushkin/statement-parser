@@ -1,6 +1,7 @@
 import { Currencies, Currency, rates } from '../index';
 import { Transaction } from '../../helpers/types';
 import { StatementType, currencyExchangeDirection } from './types';
+import { getRoundedValue } from '../../helpers/until';
 
 const defaultCurrency: Currency = 'TRY';
 
@@ -20,17 +21,13 @@ export class Statement {
         this.currency?.to || Currencies.RUB
       );
       const rate = currentRate.value;
-      // const rate = await this.getCurrencyValue(this.formatDate(item.processDate), 'TRY');
-      const convertedAmount = 5;
-      // const convertedAmount = getRoundedValue(rate * item.amount);
+      const convertedAmount = getRoundedValue(rate * item.amount);
       return {
         ...item,
         rate,
         convertedAmount,
-        currency: defaultCurrency,
         memo: `${defaultCurrency} - ${item.description}`,
-        convertedBalance: 15,
-        // convertedBalance: getRoundedValue(rate * item.balance),
+        convertedBalance: getRoundedValue(rate * item.balance),
       };
     });
 

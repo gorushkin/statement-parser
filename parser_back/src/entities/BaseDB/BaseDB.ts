@@ -24,7 +24,7 @@ export class BaseDB {
     return join(this.path, ...paths);
   }
 
-  protected async readJSONData<T>(filename: string): Promise<T> {
+  protected async getItem<T>(filename: string): Promise<T> {
     const path = this.getPath(filename);
     try {
       const buffer = await fs.readFile(path, 'utf-8');
@@ -41,7 +41,7 @@ export class BaseDB {
     return JSON.stringify(data, null, 2);
   }
 
-  protected async writeJSONData<T>(path: string, data: T) {
+  protected async saveItem<T>(path: string, data: T) {
     const fullPath = this.getPath(path);
     const serializedData = this.getSerializedData(data);
     try {
@@ -51,6 +51,11 @@ export class BaseDB {
       // TODO: add custom error
       throw new Error('writeJSONData');
     }
+  }
+
+  protected async getItems() {
+    const fileNames = await fs.readdir(this.path);
+    return fileNames.map((filename) => this.parse(filename).name);
   }
 
   protected async checkPath(path: string) {

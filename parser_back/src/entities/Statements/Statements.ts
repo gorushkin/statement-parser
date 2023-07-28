@@ -11,7 +11,7 @@ class Statements extends BaseDB {
   }
 
   async saveStatement(id: string, serializedStatement: StatementType) {
-    await this.writeJSONData(`${id}.json`, serializedStatement);
+    await this.saveItem(`${id}.json`, serializedStatement);
   }
 
   async createStatement(transactions: Transaction[], name: string) {
@@ -25,9 +25,8 @@ class Statements extends BaseDB {
 
   async getStatements() {
     try {
-      const fileNames = await fs.readdir(this.path);
-      const info = fileNames.map((filename) => this.parse(filename).name);
-      return { data: info, error: null, ok: true };
+      const statements = await this.getItems();
+      return { data: statements, error: null, ok: true };
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Something went wrong';
       return { data: null, error: message, ok: false };
@@ -36,7 +35,7 @@ class Statements extends BaseDB {
 
   async getStatementById(id: string) {
     try {
-      const parsedData = await this.readJSONData<Statement>(`${id}.json`);
+      const parsedData = await this.getItem<Statement>(`${id}.json`);
       const data = { transactions: parsedData.transactions, id };
       return { data, ok: true };
     } catch (error) {

@@ -17,12 +17,12 @@ export class Rates extends BaseDB {
   }
 
   private async readRates() {
-    this.rates = await this.readJSONData(this.filename);
+    this.rates = await this.getItem(this.filename);
   }
 
   private async saveRates(data: { rates: CurrencyRecord; date: DateString }) {
     this.rates = { ...this.rates, [data.date]: data.rates };
-    await this.writeJSONData(this.filename, this.rates);
+    await this.saveItem(this.filename, this.rates);
   }
 
   async updateRates(date: DateString) {
