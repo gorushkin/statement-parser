@@ -1,11 +1,18 @@
 import fs from 'fs/promises';
 import { ParsedPath, join, parse } from 'path';
+import { Logger, logger } from '../../logger';
 
 export class DefaultDB {
   protected path: string;
+  protected logger: Logger;
 
-  protected setPath(path: string) {
+  constructor() {
+    this.logger = logger;
+  }
+
+  protected setPath(path: string, name?: 'Rates' | 'Statements') {
     const absolutePath = this.getAbsolutePath(path);
+    if (name) this.logger.info(`${name} init, path is "${absolutePath}"`);
     this.path = this.getPath(absolutePath, 'statements');
   }
 

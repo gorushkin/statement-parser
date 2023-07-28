@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import fs from 'fs/promises';
 import { AppError, BaseError, ERROR_PLACES, ValidationError } from '../../errors/error';
 import { logger } from '../../logger';
-import { db } from '../../entities';
+import { statements } from '../../entities';
 import { FormattedRequest, File, StatementPayload, FileWithoutExt } from './types';
 import { getBody } from '../utils';
 const parser = new Parser();
@@ -26,7 +26,7 @@ export const uploadFile = async (req: Request, res: Response) => {
     const { fieldName, path } = getFileDate(fileInfo);
     const fileContent = await fs.readFile(path);
     const parsedData = getData(fileContent);
-    const { error, ok } = await db.createStatement(parsedData.transactions, fieldName);
+    const { error, ok } = await statements.createStatement(parsedData.transactions, fieldName);
     if (ok) {
       logger.info(`File "${fieldName}" was successfully uploaded`);
       return res.status(200).send({
@@ -43,14 +43,14 @@ export const uploadFile = async (req: Request, res: Response) => {
 };
 
 export const getStatements = async (_req: Request, res: Response) => {
-  const { data, error, ok } = await db.getStatements();
+  const { data, error, ok } = await statements.getStatements();
   if (ok) return res.status(200).send({ data, ok: true });
   res.status(400).send({ error });
 };
 
 export const getStatement = async (req: Request, res: Response) => {
   const { name } = req.params;
-  const result = await db.getStatementById(name);
+  const result = await statements.getStatementById(name);
   if (result.ok) return res.status(200).send({ data: result.data, ok: true });
   res.status(400).send({ error: result.error, ok: false });
 };
@@ -58,7 +58,7 @@ export const getStatement = async (req: Request, res: Response) => {
 export const uploadStatement = async (req: Request, res: Response) => {
   const body: StatementPayload = JSON.parse((await getBody(req)).toString());
   const { name, statement } = body;
-  const { data, error, ok } = await db.updateStatement(name, statement);
+  const { data, error, ok } = await statements.updateStatement(name, statement);
   if (ok) return res.status(200).send({ data });
   res.status(400).send({ error });
 };

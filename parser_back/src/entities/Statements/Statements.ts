@@ -1,15 +1,12 @@
 import { Transaction } from 'parser';
 import { DefaultDB } from '../Default/Default';
-import { logger } from '../../logger';
 import { Statement } from '../Statement';
 import fs from 'fs/promises';
 import { v4 as uuidv4 } from 'uuid';
 
 class Statements extends DefaultDB {
   init(path: string) {
-    const absolutePath = this.getAbsolutePath(path);
-    logger.info(`Start BD init, path is "${absolutePath}"`);
-    this.setPath(path);
+    this.setPath(path, 'Statements');
   }
 
   async saveStatement(id: string, serializedStatement: string) {
