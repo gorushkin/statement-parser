@@ -1,7 +1,14 @@
+import { AxiosError } from 'axios';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Request } from 'src/shared/api';
 
 import { UseFetch, UseFetchParams } from './types';
+
+const getErrorMessage = (error: unknown) => {
+  if (error instanceof AxiosError) return (error.response?.data as { error: string }).error;
+  if (error instanceof ApiError) return error.message;
+  return DEFAULT_ERROR_MESSAGE;
+};
 
 class ApiError extends Error {
   constructor(message: string) {
@@ -47,7 +54,7 @@ export const useFetch: UseFetch = <T, K>(
       } catch (error) {
         setData(initValue);
         setMessage(null);
-        const message = error instanceof ApiError ? error.message : DEFAULT_ERROR_MESSAGE;
+        const message = getErrorMessage(error);
         onError({ data: initValue, message });
         setError(message);
       } finally {
