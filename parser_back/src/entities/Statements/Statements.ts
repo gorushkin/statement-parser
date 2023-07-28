@@ -1,24 +1,20 @@
 import { Transaction } from 'parser';
-import { DefaultDB } from '../default/default';
+import { DefaultDB } from '../Default/Default';
 import { logger } from '../../logger';
-import { Statement } from '../statement';
+import { Statement } from '../Statement';
 import fs from 'fs/promises';
 import { v4 as uuidv4 } from 'uuid';
 
-class DataBase extends DefaultDB {
-  private statementsPath: string;
-  private path: string;
-
+class Statements extends DefaultDB {
   init(path: string) {
-    const absolutePath = super.getAbsolutePath(path);
+    const absolutePath = this.getAbsolutePath(path);
     logger.info(`Start BD init, path is "${absolutePath}"`);
-    this.path = absolutePath;
-    this.statementsPath = super.getPath(absolutePath, 'statements');
+    this.setPath(path);
   }
 
   async saveStatement(id: string, serializedStatement: string) {
-    const filePath = super.getPath(this.statementsPath, id);
-    await super.writeJSONData(`${filePath}.json`, serializedStatement);
+    const filePath = this.getPath(this.path, id);
+    await this.writeJSONData(`${filePath}.json`, serializedStatement);
   }
 
   async createStatement(transactions: Transaction[], name: string) {
@@ -32,8 +28,8 @@ class DataBase extends DefaultDB {
 
   async getStatements() {
     try {
-      const fileNames = await fs.readdir(this.statementsPath);
-      const info = fileNames.map((filename) => super.parse(filename).name);
+      const fileNames = await fs.readdir(this.path);
+      const info = fileNames.map((filename) => this.parse(filename).name);
       return { data: info, error: null, ok: true };
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Something went wrong';
@@ -42,12 +38,9 @@ class DataBase extends DefaultDB {
   }
 
   async getStatementById(id: string) {
-    const transactionPath = super.getPath(this.statementsPath, `${id}.json`);
+    const transactionPath = this.getPath(this.path, `${id}.json`);
     try {
-      const buffer = await fs.readFile(transactionPath);
-      const qwe = await super.readJSONData<Statement>(transactionPath);
-      console.log('qwe: ', qwe);
-      const parsedData: { transactions: Transaction[] } = JSON.parse(buffer.toString());
+      const parsedData = await this.readJSONData<Statement>(transactionPath);
       const data = { transactions: parsedData.transactions, id };
       return { data, ok: true };
     } catch (error) {
@@ -64,4 +57,4 @@ class DataBase extends DefaultDB {
   }
 }
 
-export { DataBase };
+export { Statements };

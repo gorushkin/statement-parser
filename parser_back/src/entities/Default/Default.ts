@@ -2,6 +2,13 @@ import fs from 'fs/promises';
 import { ParsedPath, join, parse } from 'path';
 
 export class DefaultDB {
+  protected path: string;
+
+  protected setPath(path: string) {
+    const absolutePath = this.getAbsolutePath(path);
+    this.path = this.getPath(absolutePath, 'statements');
+  }
+
   protected getAbsolutePath(path: string) {
     return join(process.cwd(), path);
   }
