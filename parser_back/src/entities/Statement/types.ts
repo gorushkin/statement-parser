@@ -1,14 +1,14 @@
 import { Transaction } from '../../helpers/types';
 import { Currencies } from '../types';
 
-export type currencyExchangeDirection = {
-  from: Currencies;
-  to: Currencies;
+export type StatementCurrencies = {
+  sourceCurrency: Currencies;
+  targetCurrency: Currencies;
 };
 
 export type StatementType = {
   transactions: Transaction[];
   id: string;
-  currency: currencyExchangeDirection | null;
+  currencies: StatementCurrencies | null;
   name: string;
 };

@@ -3,6 +3,7 @@ import { BaseDB } from '../BaseDB/BaseDB';
 import { Statement } from '../Statement';
 import { v4 as uuidv4 } from 'uuid';
 import { StatementType } from '../index';
+import { StatementCurrencies } from '../Statement/types';
 
 class Statements extends BaseDB {
   init(path: string) {
@@ -13,9 +14,13 @@ class Statements extends BaseDB {
     await this.saveItem(`${id}.json`, serializedStatement);
   }
 
-  async createStatement(transactions: Transaction[], name: string) {
+  async createStatement(
+    transactions: Transaction[],
+    name: string,
+    currencies: StatementCurrencies
+  ) {
     const id = uuidv4();
-    const statement = new Statement(id, transactions, name, null);
+    const statement = new Statement(id, transactions, name, currencies);
     await statement.updateTransactions();
     const statementData = statement.getStatement();
     await this.saveStatement(id, statementData);
@@ -35,8 +40,13 @@ class Statements extends BaseDB {
   async getStatementById(id: string) {
     try {
       const parsedData = await this.getItem<Statement>(`${id}.json`);
-      const data = { transactions: parsedData.transactions, id, name: parsedData.name };
-      return { data, ok: true };
+      const statementData = {
+        transactions: parsedData.transactions,
+        id,
+        name: parsedData.name,
+        currencies: parsedData.currencies,
+      };
+      return { data: statementData, ok: true };
     } catch (error) {
       const message = 'The filename is not correct';
       return { error: message, ok: false };
