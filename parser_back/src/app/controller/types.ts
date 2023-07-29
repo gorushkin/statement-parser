@@ -22,5 +22,5 @@ export type File = Xlsx | FileWithoutExt | Csv;
 
 export interface FormattedRequest {
   files: Record<string, File>;
-  body: { name: string; from: Currencies; to: Currencies };
+  body: { name: string; sourceCurrency: Currencies; targetCurrency: Currencies };
 }

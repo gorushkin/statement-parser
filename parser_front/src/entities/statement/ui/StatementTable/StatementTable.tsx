@@ -11,17 +11,19 @@ import { useNotify } from 'src/shared/useNotify';
 import { statement } from '../../model';
 import { StatementHead } from '../StatementHead';
 import { StatementRow } from '../StatementRow';
+import { StatementSummary } from '../StatementSummary';
 import styles from './StatementTable.module.scss';
 
 export const StatementTable = observer(() => {
   const { addErrorMessage } = useNotify();
 
   const [{ isLoading }, fetchData] = useFetch(statementApi.getStatementRequest, {
-    init: { name: '', transactions: [] },
+    init: { currencies: { sourceCurrency: null, targetCurrency: null }, name: '', transactions: [] },
     onError: addErrorMessage,
-    onSuccess: (res) => {
-      statement.transactions = res.data.transactions;
-      statement.title = res.data.name;
+    onSuccess: ({ data: { currencies, name, transactions } }) => {
+      statement.transactions = transactions;
+      statement.title = name;
+      statement.currencies = currencies;
     },
   });
 
@@ -41,6 +43,11 @@ export const StatementTable = observer(() => {
       <Heading as="h1" mb="5" textAlign="center">
         {statement.title}
       </Heading>
+      <StatementSummary
+        convertedSummary={statement.convertedSummary}
+        currencies={statement.currencies}
+        summary={statement.summary}
+      />
       <TableContainer className={styles.tableContainer}>
         <Table className={styles.table} variant="simple">
           <StatementHead />

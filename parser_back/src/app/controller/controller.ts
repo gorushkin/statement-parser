@@ -20,14 +20,18 @@ const getFileDate = (fileInfo: File): FileWithoutExt => {
 export const uploadFile = async (req: Request, res: Response) => {
   try {
     const formattedRequest = req as unknown as FormattedRequest;
-    const { to, from } = formattedRequest.body;
-    if (!to || !from) throw new ValidationError(ERROR_PLACES.gettingCurrencies);
+    const { targetCurrency, sourceCurrency } = formattedRequest.body;
+    if (!targetCurrency || !sourceCurrency)
+      throw new ValidationError(ERROR_PLACES.gettingCurrencies);
     const files = Object.values(formattedRequest.files);
     const fileInfo = files[0];
     const { fieldName, path } = getFileDate(fileInfo);
     const fileContent = await fs.readFile(path);
     const parsedData = getData(fileContent);
-    const { error, ok } = await statements.createStatement(parsedData.transactions, fieldName);
+    const { error, ok } = await statements.createStatement(parsedData.transactions, fieldName, {
+      sourceCurrency,
+      targetCurrency,
+    });
     if (!ok) throw new AppError(ERROR_PLACES.uploadFile, error);
     logger.info(`File "${fieldName}" was successfully uploaded`);
     return res.status(200).send({
@@ -48,8 +52,9 @@ export const getStatements = async (_req: Request, res: Response) => {
 };
 
 export const getStatement = async (req: Request, res: Response) => {
-  const { name } = req.params;
-  const result = await statements.getStatementById(name);
+  const { id } = req.params;
+  const result = await statements.getStatementById(id);
+  console.log('result: ', result);
   if (result.ok) return res.status(200).send({ data: result.data, ok: true });
   res.status(400).send({ error: result.error, ok: false });
 };

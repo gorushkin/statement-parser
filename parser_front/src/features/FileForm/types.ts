@@ -1,4 +1,4 @@
-import { Currencies } from 'src/shared/api/models';
+import { ConvertDirections, Currencies, StatementCurrencies } from 'src/shared/api/models';
 
 export type FileInfo = {
   file: File;
@@ -6,14 +6,12 @@ export type FileInfo = {
   size: number;
 };
 
+// export type ConvertDirection = keyof StatementCurrencies;
+
 export type HandleCurrenciesChangeType = ({
   direction,
   value,
 }: {
-  direction: 'from' | 'to';
+  direction: ConvertDirections;
   value: Currencies;
 }) => void;
-
-export type ConvertDirection = 'from' | 'to';
-
-export type CurrencyState = { from: Currencies; to: Currencies };
