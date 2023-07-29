@@ -28,6 +28,7 @@ export const uploadFile = async (req: Request, res: Response) => {
     const { fieldName, path } = getFileDate(fileInfo);
     const fileContent = await fs.readFile(path);
     const parsedData = getData(fileContent);
+    // TODO: add statement to response
     const { error, ok } = await statements.createStatement(parsedData.transactions, fieldName, {
       sourceCurrency,
       targetCurrency,
@@ -54,7 +55,6 @@ export const getStatements = async (_req: Request, res: Response) => {
 export const getStatement = async (req: Request, res: Response) => {
   const { id } = req.params;
   const result = await statements.getStatementById(id);
-  console.log('result: ', result);
   if (result.ok) return res.status(200).send({ data: result.data, ok: true });
   res.status(400).send({ error: result.error, ok: false });
 };

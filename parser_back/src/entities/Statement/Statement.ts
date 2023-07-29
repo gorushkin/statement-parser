@@ -26,7 +26,7 @@ export class Statement {
         ...item,
         rate,
         convertedAmount,
-        memo: `${defaultCurrency} - ${item.description}`,
+        memo: `${item.amount} ${this.currencies.sourceCurrency} (rate: ${rate}) - ${item.description}`,
         convertedBalance: getRoundedValue(rate * item.balance),
       };
     });
