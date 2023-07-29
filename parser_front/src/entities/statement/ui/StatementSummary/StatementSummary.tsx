@@ -1,16 +1,22 @@
 import { Table, TableContainer, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react';
 import { FC } from 'react';
+import { StatementCurrencies } from 'src/shared/api/models';
 
 import { Summary } from '../../model';
+import { columnFormatMapping } from '../StatementRow/lib';
 import styles from './StatementSummary.module.scss';
 
 interface StatementSummaryProps {
+  convertedSummary: Summary;
+  currencies: StatementCurrencies;
   summary: Summary;
 }
 
 const StatementSummary: FC<StatementSummaryProps> = (props) => {
   const {
-    summary: { endBalance, income, outcome, startBalance },
+    convertedSummary,
+    currencies: { sourceCurrency, targetCurrency },
+    summary,
   } = props;
 
   return (
@@ -27,18 +33,18 @@ const StatementSummary: FC<StatementSummaryProps> = (props) => {
         </Thead>
         <Tbody>
           <Tr>
-            <Td>Current Currency</Td>
-            <Td>{startBalance}</Td>
-            <Td>{income}</Td>
-            <Td>{outcome}</Td>
-            <Td>{endBalance}</Td>
+            <Td>{sourceCurrency}</Td>
+            <Td>{summary.startBalance}</Td>
+            <Td>{summary.income}</Td>
+            <Td>{summary.outcome}</Td>
+            <Td>{summary.endBalance}</Td>
           </Tr>
           <Tr>
-            <Td>Converted Currency</Td>
-            <Td>{startBalance}</Td>
-            <Td>{income}</Td>
-            <Td>{outcome}</Td>
-            <Td>{endBalance}</Td>
+            <Td>{targetCurrency}</Td>
+            <Td>{columnFormatMapping.amount(convertedSummary.startBalance)}</Td>
+            <Td>{columnFormatMapping.amount(convertedSummary.income)}</Td>
+            <Td>{columnFormatMapping.amount(convertedSummary.outcome)}</Td>
+            <Td>{columnFormatMapping.amount(convertedSummary.endBalance)}</Td>
           </Tr>
         </Tbody>
       </Table>

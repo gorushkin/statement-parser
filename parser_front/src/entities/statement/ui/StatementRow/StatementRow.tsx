@@ -14,15 +14,11 @@ export const StatementRow: FC<StatementRowProps> = ({ row }) => {
     amount,
     balance,
     convertedAmount,
-    data,
+    convertedBalance,
     description,
-    id,
-    isClear,
     memo,
-    payeeId,
     payeeName,
     processDate,
-    rate,
     transactionDate,
   } = row;
 
@@ -33,6 +29,7 @@ export const StatementRow: FC<StatementRowProps> = ({ row }) => {
       <Td>{columnFormatMapping.amount(amount)}</Td>
       <Td>{columnFormatMapping.amount(convertedAmount)}</Td>
       <Td>{columnFormatMapping.amount(balance)}</Td>
+      <Td>{columnFormatMapping.amount(convertedBalance)}</Td>
       <Td>{description}</Td>
       <Td>{payeeName}</Td>
       <Td>{memo}</Td>

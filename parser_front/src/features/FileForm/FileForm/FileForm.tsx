@@ -1,6 +1,6 @@
 import { Box, Button, Input, Text } from '@chakra-ui/react';
 import { ChangeEvent, FC, FormEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { Currencies } from 'src/shared/api/models';
+import { ConvertDirections, Currencies, StatementCurrencies } from 'src/shared/api/models';
 import { uploadFileRequest } from 'src/shared/api/statement';
 import { useFetch } from 'src/shared/useFetch';
 import { Payload } from 'src/shared/useFetch/types';
@@ -9,13 +9,16 @@ import { cn } from 'src/shared/utils';
 
 import { CurrencySelector } from '../CurrencySelector';
 import { useFileDrop } from '../lib/';
-import { ConvertDirection, CurrencyState, FileInfo } from '../types';
+import { FileInfo } from '../types';
 import styles from './FileForm.module.scss';
 
 const FileForm: FC = () => {
   const [fileInfo, setFileInfo] = useState<FileInfo | null>(null);
   const [name, setName] = useState('');
-  const [currencies, setCurrencies] = useState<CurrencyState>({ from: Currencies.TRY, to: Currencies.RUB });
+  const [currencies, setCurrencies] = useState<StatementCurrencies>({
+    sourceCurrency: Currencies.TRY,
+    targetCurrency: Currencies.RUB,
+  });
   const [isFormValid, setIsFromValid] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textInputRef = useRef<HTMLInputElement>(null);
@@ -85,7 +88,7 @@ const FileForm: FC = () => {
   }, [fileInfo]);
 
   const handleCurrenciesChange = useCallback(
-    ({ direction, value }: { direction: ConvertDirection; value: Currencies }) => {
+    ({ direction, value }: { direction: ConvertDirections; value: Currencies }) => {
       setCurrencies((state) => ({ ...state, [direction]: value }));
     },
     []

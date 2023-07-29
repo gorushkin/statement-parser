@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx';
-import { Transaction, Transactions } from 'src/shared/api/models';
+import { Currencies, Transaction, Transactions } from 'src/shared/api/models';
 import { stringToDate } from 'src/shared/utils';
 
 import { Summary } from './types';
@@ -14,15 +14,17 @@ const columns: { convert: (value: string) => string; map: keyof Transaction; nam
 ];
 
 export class Statement {
-  #transactions: Transactions;
+  private _transactions: Transactions;
+  convertedSummary: Summary;
   csvContent = 'data:text/csv;charset=utf-8,';
+  currencies: { sourceCurrency: Currencies | null; targetCurrency: Currencies | null };
   headers = columns.map((column) => this.addQuotes(column.name)).join(',');
   summary: Summary;
   title: string;
 
   constructor() {
     makeAutoObservable(this);
-    this.#transactions = [];
+    this._transactions = [];
     this.title = '';
     this.summary = {
       endBalance: 0,
@@ -30,6 +32,13 @@ export class Statement {
       outcome: 0,
       startBalance: 0,
     };
+    this.convertedSummary = {
+      endBalance: 0,
+      income: 0,
+      outcome: 0,
+      startBalance: 0,
+    };
+    this.currencies = { sourceCurrency: null, targetCurrency: null };
   }
 
   addQuotes(value: string) {
@@ -37,7 +46,7 @@ export class Statement {
   }
 
   getConvertedStatement() {
-    const convertedTransactions = this.#transactions
+    const convertedTransactions = this._transactions
       .map((transaction) =>
         columns.map((column) => this.addQuotes(column.convert(transaction[column.map] as string))).join(',')
       )
@@ -49,30 +58,36 @@ export class Statement {
   }
 
   set transactions(transactions: Transaction[]) {
-    this.#transactions = transactions;
+    this._transactions = transactions;
     this.updateSummary();
   }
 
   get transactions() {
-    return this.#transactions;
+    return this._transactions;
   }
 
   updateSummary() {
-    const firstTransaction = this.#transactions[0];
+    const firstTransaction = this._transactions[0];
     this.summary.startBalance = firstTransaction.balance - firstTransaction.amount;
-    const lastTransaction = this.#transactions[this.#transactions.length - 1];
+    this.convertedSummary.startBalance = firstTransaction.convertedBalance - firstTransaction.convertedAmount;
+    const lastTransaction = this._transactions[this._transactions.length - 1];
     this.summary.endBalance = lastTransaction.balance;
+    this.convertedSummary.endBalance = lastTransaction.convertedBalance;
 
-    const { income, outcome } = this.#transactions.reduce(
+    const { convertedIncome, convertedOutcome, income, outcome } = this._transactions.reduce(
       (acc, item) => ({
         ...acc,
         ...(item.amount >= 0 && { income: acc.income + item.amount }),
+        ...(item.convertedAmount >= 0 && { convertedIncome: acc.convertedIncome + item.convertedAmount }),
         ...(item.amount < 0 && { outcome: acc.outcome + item.amount }),
+        ...(item.convertedAmount < 0 && { convertedOutcome: acc.convertedOutcome + item.convertedAmount }),
       }),
-      { income: 0, outcome: 0 }
+      { convertedIncome: 0, convertedOutcome: 0, income: 0, outcome: 0 }
     );
 
     this.summary.income = income;
     this.summary.outcome = outcome;
+    this.convertedSummary.income = convertedIncome;
+    this.convertedSummary.outcome = convertedOutcome;
   }
 }

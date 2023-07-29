@@ -14,6 +14,7 @@ const StatementHead: FC<StatementHeadProps> = () => {
         <Th>Amount</Th>
         <Th>Converted Amount</Th>
         <Th>Balance</Th>
+        <Th>Converted Balance</Th>
         <Th>Description</Th>
         <Th>Payee</Th>
         <Th>Memo</Th>
