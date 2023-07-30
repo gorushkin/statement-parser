@@ -22,12 +22,13 @@ export class Statement {
       );
       const rate = currentRate.value;
       const convertedAmount = getRoundedValue(rate * item.amount);
+      const convertedBalance = getRoundedValue(rate * item.balance);
       return {
         ...item,
         rate,
         convertedAmount,
-        memo: `${item.amount} ${this.currencies.sourceCurrency} (rate: ${rate}) - ${item.description}`,
-        convertedBalance: getRoundedValue(rate * item.balance),
+        memo: `${item.amount} ${this.currencies.sourceCurrency} (rate: ${rate}):[${convertedBalance}] - ${item.description}`,
+        convertedBalance,
       };
     });
 
