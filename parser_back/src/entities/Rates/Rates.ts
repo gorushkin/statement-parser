@@ -13,7 +13,15 @@ export class Rates extends BaseDB {
 
   async init(path: string) {
     this.setPath(path, 'rates');
+    await this.checkFolder()
+    await this.checkFile();
     await this.readRates();
+  }
+
+  private async checkFile() {
+    const isRatesFileExist = await this.checkPath(this.getPath(this.filename));
+    if (isRatesFileExist) return;
+    await this.createFile(this.filename, {});
   }
 
   private async readRates() {

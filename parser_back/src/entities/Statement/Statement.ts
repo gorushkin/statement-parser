@@ -1,9 +1,7 @@
-import { Currency, rates } from '../index';
+import { rates } from '../index';
 import { Transaction } from '../../helpers/types';
 import { StatementType, StatementCurrencies } from './types';
-import { getRoundedValue } from '../../helpers/until';
-
-const defaultCurrency: Currency = 'TRY';
+import { getRoundedValue, numberToMoney } from '../../helpers/until';
 
 export class Statement {
   constructor(
@@ -23,11 +21,12 @@ export class Statement {
       const rate = currentRate.value;
       const convertedAmount = getRoundedValue(rate * item.amount);
       const convertedBalance = getRoundedValue(rate * item.balance);
+      const formattedBalance = numberToMoney(item.balance);
       return {
         ...item,
         rate,
         convertedAmount,
-        memo: `${item.amount} ${this.currencies.sourceCurrency} (rate: ${rate}):[${convertedBalance}] - ${item.description}`,
+        memo: `${item.amount} ${this.currencies.sourceCurrency} (rate: ${rate}):[${formattedBalance}] - ${item.description}`,
         convertedBalance,
       };
     });

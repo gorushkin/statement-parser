@@ -63,7 +63,8 @@ export class Statement {
     this.convertedSummary.startBalance = firstTransaction.convertedBalance - firstTransaction.convertedAmount;
     const lastTransaction = this._transactions[this._transactions.length - 1];
     this.summary.endBalance = lastTransaction.balance;
-    this.convertedSummary.endBalance = lastTransaction.convertedBalance;
+    this.convertedSummary.endBalance =
+      this._transactions.reduce((sum, item) => sum + item.convertedAmount, 0) + this.convertedSummary.startBalance;
 
     const { convertedIncome, convertedOutcome, income, outcome } = this._transactions.reduce(
       (acc, item) => ({

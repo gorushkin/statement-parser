@@ -54,3 +54,10 @@ export const getRates = async (date: string) => {
 };
 
 export const getRoundedValue = (value: number) => Math.round(value * 100) / 100;
+
+
+export const numberToMoney = (value: number, decimalPlaces = 2) =>
+  `${value?.toLocaleString(undefined, {
+    maximumFractionDigits: decimalPlaces,
+    minimumFractionDigits: decimalPlaces,
+  })}`;

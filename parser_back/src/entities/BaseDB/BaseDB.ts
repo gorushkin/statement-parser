@@ -67,11 +67,21 @@ export class BaseDB {
     }
   }
 
-  protected async makeFolder(path: string) {
+  protected async makeDirectory() {
     try {
-      await fs.mkdir(path);
+      await fs.mkdir(this.path);
     } catch (error) {
       console.log('error: ', error);
     }
+  }
+
+  protected async createFile<T>(filename: string, data: T) {
+    await this.saveItem(filename, data);
+  }
+
+  protected async checkFolder() {
+    const isDirExist = await this.checkPath(this.path);
+    if (isDirExist) return;
+    await this.makeDirectory();
   }
 }
