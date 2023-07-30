@@ -1,17 +1,8 @@
 import { makeAutoObservable } from 'mobx';
 import { Currencies, Transaction, Transactions } from 'src/shared/api/models';
-import { stringToDate } from 'src/shared/utils';
 
+import { columns } from '../libs';
 import { Summary } from './types';
-
-const DEFAULT_DATE_FORMAT = 'MM/MM/YYYY';
-
-const columns: { convert: (value: string) => string; map: keyof Transaction; name: string }[] = [
-  { convert: (value: string) => stringToDate(value, DEFAULT_DATE_FORMAT), map: 'processDate', name: 'Date' },
-  { convert: (value: string) => value, map: 'payeeName', name: 'Payee' },
-  { convert: (value: string) => value, map: 'memo', name: 'Memo' },
-  { convert: (value: string) => value, map: 'amount', name: 'Amount' },
-];
 
 export class Statement {
   private _transactions: Transactions;

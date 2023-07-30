@@ -9,7 +9,7 @@ const StatementControlButtons = observer(() => {
     const { file, name } = statement.getConvertedStatement();
     const blob = new Blob([file], { type: 'text/csv' });
     const a = document.createElement('a');
-    a.download = name;
+    a.download = `${name}.csv`;
     a.href = URL.createObjectURL(blob);
     a.addEventListener('click', () => {
       setTimeout(() => URL.revokeObjectURL(a.href), 30 * 1000);
