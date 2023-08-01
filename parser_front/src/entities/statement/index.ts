@@ -1,2 +1,2 @@
-export { statement } from './model';
+export { statement, Statement } from './model/index';
 export { StatementTable } from './ui';

@@ -1,22 +1,24 @@
-import { makeAutoObservable } from 'mobx';
-import { Currencies, Transaction, Transactions } from 'src/shared/api/models';
+import { makeObservable, observable } from 'mobx';
+import { DB } from 'src/entities/db';
+import { Currencies, StatementType, Transactions } from 'src/shared/api/models';
 
 import { columns } from '../libs';
 import { Summary } from './types';
 
-export class Statement {
-  private _transactions: Transactions;
+export class Statement extends DB {
+  private csvContent = 'data:text/csv;charset=utf-8,';
+  private headers = columns.map((column) => this.addQuotes(column.name)).join(',');
   convertedSummary: Summary;
-  csvContent = 'data:text/csv;charset=utf-8,';
-  currencies: { sourceCurrency: Currencies | null; targetCurrency: Currencies | null };
-  headers = columns.map((column) => this.addQuotes(column.name)).join(',');
+  currencies: { sourceCurrency: Currencies; targetCurrency: Currencies };
+  id: string;
+  name: string;
   summary: Summary;
-  title: string;
+  transactions: Transactions;
 
-  constructor() {
-    makeAutoObservable(this);
-    this._transactions = [];
-    this.title = '';
+  constructor(data?: StatementType) {
+    super(data?.id ?? '');
+    this.transactions = data?.transactions ?? [];
+    this.name = data?.name ?? '';
     this.summary = {
       endBalance: 0,
       income: 0,
@@ -29,44 +31,40 @@ export class Statement {
       outcome: 0,
       startBalance: 0,
     };
-    this.currencies = { sourceCurrency: null, targetCurrency: null };
+    this.currencies = data?.currencies ?? { sourceCurrency: Currencies.TRY, targetCurrency: Currencies.RUB };
+    this.id = data?.id ?? '';
+
+    makeObservable(this, {
+      convertedSummary: observable,
+      currencies: observable,
+      id: observable,
+      name: observable,
+      summary: observable,
+      transactions: observable,
+    });
   }
 
-  addQuotes(value: string) {
+  private addQuotes(value: string) {
     return `"${value}"`;
   }
 
-  getConvertedStatement() {
-    const convertedTransactions = this._transactions
-      .map((transaction) =>
-        columns.map((column) => this.addQuotes(column.convert(transaction[column.map] as string))).join(',')
-      )
-      .join('\n');
-
-    const convertedStatement = this.headers + '\n' + convertedTransactions;
-
-    return { file: convertedStatement, name: this.title };
-  }
-
-  set transactions(transactions: Transaction[]) {
-    this._transactions = transactions;
+  private init({ currencies, name, transactions }: StatementType) {
+    this.transactions = transactions;
+    this.currencies = currencies;
+    this.name = name;
     this.updateSummary();
   }
 
-  get transactions() {
-    return this._transactions;
-  }
-
-  updateSummary() {
-    const firstTransaction = this._transactions[0];
+  private updateSummary() {
+    const firstTransaction = this.transactions[0];
     this.summary.startBalance = firstTransaction.balance - firstTransaction.amount;
     this.convertedSummary.startBalance = firstTransaction.convertedBalance - firstTransaction.convertedAmount;
-    const lastTransaction = this._transactions[this._transactions.length - 1];
+    const lastTransaction = this.transactions[this.transactions.length - 1];
     this.summary.endBalance = lastTransaction.balance;
     this.convertedSummary.endBalance =
-      this._transactions.reduce((sum, item) => sum + item.convertedAmount, 0) + this.convertedSummary.startBalance;
+      this.transactions.reduce((sum, item) => sum + item.convertedAmount, 0) + this.convertedSummary.startBalance;
 
-    const { convertedIncome, convertedOutcome, income, outcome } = this._transactions.reduce(
+    const { convertedIncome, convertedOutcome, income, outcome } = this.transactions.reduce(
       (acc, item) => ({
         ...acc,
         ...(item.amount >= 0 && { income: acc.income + item.amount }),
@@ -81,5 +79,28 @@ export class Statement {
     this.summary.outcome = outcome;
     this.convertedSummary.income = convertedIncome;
     this.convertedSummary.outcome = convertedOutcome;
+  }
+
+  getCSV() {
+    const convertedTransactions = this.transactions
+      .map((transaction) =>
+        columns.map((column) => this.addQuotes(column.convert(transaction[column.map] as string))).join(',')
+      )
+      .join('\n');
+
+    const convertedStatement = this.headers + '\n' + convertedTransactions;
+
+    return { file: convertedStatement, name: this.name };
+  }
+
+  getStatement(id: string) {
+    this.key = id;
+    const data = this.read<StatementType>();
+    this.init(data);
+  }
+
+  saveStatement() {
+    const data = { currencies: this.currencies, id: this.id, name: this.name, transactions: this.transactions };
+    this.save(data);
   }
 }
