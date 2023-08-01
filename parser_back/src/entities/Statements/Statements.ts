@@ -24,7 +24,7 @@ class Statements extends BaseDB {
     await statement.updateTransactions();
     const statementData = statement.getStatement();
     await this.saveStatement(id, statementData);
-    return { error: null, ok: true };
+    return { error: null, ok: true, data: statementData };
   }
 
   async getStatements() {

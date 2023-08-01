@@ -28,16 +28,20 @@ export const uploadFile = async (req: Request, res: Response) => {
     const { fieldName, path } = getFileDate(fileInfo);
     const fileContent = await fs.readFile(path);
     const parsedData = getData(fileContent);
-    // TODO: add statement to response
-    const { error, ok } = await statements.createStatement(parsedData.transactions, fieldName, {
-      sourceCurrency,
-      targetCurrency,
-    });
+    const { error, ok, data } = await statements.createStatement(
+      parsedData.transactions,
+      fieldName,
+      {
+        sourceCurrency,
+        targetCurrency,
+      }
+    );
     if (!ok) throw new AppError(ERROR_PLACES.uploadFile, error);
     logger.info(`File "${fieldName}" was successfully uploaded`);
     return res.status(200).send({
       message: `File "${fieldName}" was uploaded and will be available in a few minutes`,
       ok: true,
+      data,
     });
   } catch (error) {
     const message = error instanceof BaseError ? error.userMessage : 'Something went wrong';
