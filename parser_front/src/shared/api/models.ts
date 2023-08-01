@@ -9,7 +9,6 @@ export type Transaction = {
   convertedBalance: number;
   data: string;
   description: string;
-  editedAmount: number;
   id: string;
   isClear: boolean;
   memo: string;
@@ -32,17 +31,19 @@ export enum ConvertDirections {
 }
 
 export type StatementCurrencies = {
-  [ConvertDirections.SOURCE]: Currencies | null;
-  [ConvertDirections.TARGET]: Currencies | null;
+  [ConvertDirections.SOURCE]: Currencies;
+  [ConvertDirections.TARGET]: Currencies;
 };
 
 export type Transactions = Transaction[];
+// TODO: remove this type
+export type StatementType = { currencies: StatementCurrencies; id: string; name: string; transactions: Transaction[] };
 
 export type UploadFileProps = { currencies: StatementCurrencies; file: File; name: string };
-export type ApiUploadFileResponse = Response<null>;
+export type ApiUploadFileResponse = Response<StatementType>;
 
 export type GetStatementsResponse = string[];
 export type ApiStatementsResponse = Response<GetStatementsResponse>;
 
-export type GetStatementResponse = { currencies: StatementCurrencies; name: string; transactions: Transaction[] };
+export type GetStatementResponse = StatementType;
 export type ApiStatementResponse = Response<GetStatementResponse>;

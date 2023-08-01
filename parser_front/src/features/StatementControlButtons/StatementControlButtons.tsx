@@ -1,12 +1,12 @@
 import { Box, Button } from '@chakra-ui/react';
 import { observer } from 'mobx-react';
-import { statement } from 'src/entities/statement';
+import { statement } from 'src/entities/statement/';
 
 import styles from './StatementControlButtons.module.scss';
 
 const StatementControlButtons = observer(() => {
   const onExportClickHandle = () => {
-    const { file, name } = statement.getConvertedStatement();
+    const { file, name } = statement.getCSV();
     const blob = new Blob([file], { type: 'text/csv' });
     const a = document.createElement('a');
     a.download = `${name}.csv`;

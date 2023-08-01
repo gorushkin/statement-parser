@@ -1,34 +1,30 @@
 import { Button, Table, TableCaption, TableContainer, Tbody, Td, Tr } from '@chakra-ui/react';
+import { observer } from 'mobx-react';
 import { FC, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getStatementsRequest } from 'src/shared/api/statement';
+import { statementList } from 'src/entities/statementList';
 import { ROUTE } from 'src/shared/routes';
-import { useFetch } from 'src/shared/useFetch';
-import { useNotify } from 'src/shared/useNotify';
 
 import styles from './StatementsList.module.scss';
 
-const StatementsList: FC = () => {
-  const { addErrorMessage } = useNotify();
-
-  const [{ data }, fetchData] = useFetch(getStatementsRequest, {
-    init: [],
-    onError: addErrorMessage,
-  });
-
+const StatementsList: FC = observer(() => {
   useEffect(() => {
-    void fetchData();
-  }, [fetchData]);
+    statementList.getStatements();
+  }, []);
+
+  const handleDeleteClick = (id: string) => {
+    statementList.deleteStatement(id);
+  };
 
   return (
     <TableContainer className={styles.wrapper}>
       <Table className={styles.table} colorScheme="blue" variant="simple">
         <TableCaption>Statements</TableCaption>
         <Tbody>
-          {data?.map((name) => (
-            <Tr key={name}>
+          {statementList.statements?.map(({ id, name }) => (
+            <Tr key={id}>
               <Td>
-                <Link to={`${ROUTE.STATEMENTS}/${name}`}>{name}</Link>
+                <Link to={`${ROUTE.STATEMENTS}/${id}`}>{name}</Link>
               </Td>
               <Td className={styles.buttonCell}>
                 <Button colorScheme="green" size="xs">
@@ -36,7 +32,7 @@ const StatementsList: FC = () => {
                 </Button>
               </Td>
               <Td className={styles.buttonCell}>
-                <Button colorScheme="red" size="xs">
+                <Button colorScheme="red" onClick={() => handleDeleteClick(id)} size="xs">
                   Delete
                 </Button>
               </Td>
@@ -46,6 +42,6 @@ const StatementsList: FC = () => {
       </Table>
     </TableContainer>
   );
-};
+});
 
 export { StatementsList };

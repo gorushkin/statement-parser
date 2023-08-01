@@ -1,6 +1,8 @@
 import { Box, Button, Input, Text } from '@chakra-ui/react';
+import { observer } from 'mobx-react';
 import { ChangeEvent, FC, FormEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { ConvertDirections, Currencies, StatementCurrencies } from 'src/shared/api/models';
+import { statementList } from 'src/entities/statementList';
+import { ConvertDirections, Currencies, StatementCurrencies, StatementType } from 'src/shared/api/models';
 import { uploadFileRequest } from 'src/shared/api/statement';
 import { useFetch } from 'src/shared/useFetch';
 import { Payload } from 'src/shared/useFetch/types';
@@ -12,7 +14,7 @@ import { useFileDrop } from '../lib/';
 import { FileInfo } from '../types';
 import styles from './FileForm.module.scss';
 
-const FileForm: FC = () => {
+const FileForm: FC = observer(() => {
   const [fileInfo, setFileInfo] = useState<FileInfo | null>(null);
   const [name, setName] = useState('');
   const [currencies, setCurrencies] = useState<StatementCurrencies>({
@@ -25,12 +27,13 @@ const FileForm: FC = () => {
 
   const { addErrorMessage, addSuccessMessage } = useNotify();
 
-  const handleUploadSuccess = (e: Payload<null>) => {
+  const handleUploadSuccess = (e: Payload<StatementType>) => {
+    statementList.addStatement(e.data);
     addSuccessMessage({ message: e.message });
     handleFormReset();
   };
 
-  const handleUploadError = (e: Payload<null>) => {
+  const handleUploadError = (e: Payload<StatementType>) => {
     addErrorMessage({ message: e.message });
     setIsFromValid(true);
     handleReset();
@@ -159,6 +162,6 @@ const FileForm: FC = () => {
       </Box>
     </form>
   );
-};
+});
 
 export { FileForm };

@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { StatementsList } from 'src/features/StatementsList';
+import { StatementsList } from 'src/entities/statementList/ui/StatementsList';
 
 const Statements: FC = () => {
   return <StatementsList />;
