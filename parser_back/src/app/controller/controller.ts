@@ -21,8 +21,8 @@ export const uploadFile = async (req: Request, res: Response) => {
   try {
     const formattedRequest = req as unknown as FormattedRequest;
     const { targetCurrency, sourceCurrency } = formattedRequest.body;
-    if (!targetCurrency || !sourceCurrency)
-      throw new ValidationError(ERROR_PLACES.gettingCurrencies);
+    // if (!targetCurrency || !sourceCurrency)
+    //   throw new ValidationError(ERROR_PLACES.gettingCurrencies);
     const files = Object.values(formattedRequest.files);
     const fileInfo = files[0];
     const { fieldName, path } = getFileDate(fileInfo);
