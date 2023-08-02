@@ -10,6 +10,7 @@ import { useNotify } from 'src/shared/useNotify';
 import { cn } from 'src/shared/utils';
 
 import { CurrencySelector } from '../CurrencySelector';
+import { FormatSelector } from '../FormatSelector';
 import { useFileDrop } from '../lib/';
 import { useForm } from '../lib/useForm';
 import styles from './FileForm.module.scss';
@@ -116,6 +117,7 @@ const FileForm: FC = observer(() => {
               type="text"
               value={values.name}
             />
+            <FormatSelector />
             <CurrencySelector
               isSelectorEnabled={values.isSelectorEnabled}
               onChange={handleCurrenciesChange}
