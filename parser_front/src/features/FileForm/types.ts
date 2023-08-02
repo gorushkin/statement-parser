@@ -15,3 +15,8 @@ export type HandleCurrenciesChangeType = ({
   direction: ConvertDirections;
   value: Currencies;
 }) => void;
+
+export enum FORMATS {
+  CSV = 'csv',
+  XLS = 'xls',
+}
