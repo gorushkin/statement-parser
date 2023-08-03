@@ -1,5 +1,5 @@
 import { makeObservable, observable } from 'mobx';
-import { DB } from 'src/entities/db';
+import { DB } from 'src/entities/dataBase';
 import { Currencies, StatementType, Transactions } from 'src/shared/api/models';
 
 import { columns } from '../libs';

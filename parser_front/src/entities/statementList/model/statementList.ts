@@ -1,5 +1,5 @@
 import { action, makeObservable, observable } from 'mobx';
-import { DB } from 'src/entities/db';
+import { DB } from 'src/entities/dataBase';
 import { Statement } from 'src/entities/statement';
 import { StatementType } from 'src/shared/api/models';
 
