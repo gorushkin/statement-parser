@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Currencies, StatementCurrencies } from 'src/shared/api/models';
 
-import { FileInfo, FORMATS } from '../types';
+import { FileFormat, FileInfo } from '../types';
 
 export const useForm = () => {
   const [isSelectorEnabled, setIsSelectorEnabled] = useState(false);
-  const [format, setFormat] = useState<FORMATS>(FORMATS.CSV);
+  const [fileFormat, setFileFormat] = useState<FileFormat>(FileFormat.CSV);
 
   const [isFormValid, setIsFromValid] = useState(false);
 
@@ -20,9 +20,12 @@ export const useForm = () => {
 
   const handleCheckboxChange = (e: boolean) => setIsSelectorEnabled(e);
 
+  const handleFormatChange = (e: string) => setFileFormat(e as FileFormat);
+
   return {
     handleCheckboxChange,
     setValues: {
+      handleFormatChange,
       setCurrencies,
       setFileInfo,
       setIsFromValid,
@@ -30,6 +33,7 @@ export const useForm = () => {
     },
     values: {
       currencies,
+      fileFormat,
       fileInfo,
       isFormValid,
       isSelectorEnabled,

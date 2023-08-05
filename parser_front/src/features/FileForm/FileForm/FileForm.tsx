@@ -1,6 +1,7 @@
 import { Box, Button, Input, Text } from '@chakra-ui/react';
 import { observer } from 'mobx-react';
-import { ChangeEvent, FC, FormEvent, useCallback, useEffect, useRef } from 'react';
+import { ChangeEvent, FC, FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { Converter } from 'src/entities/converter';
 import { statementList } from 'src/entities/statementList';
 import { ConvertDirections, Currencies, StatementType } from 'src/shared/api/models';
 import { uploadFileRequest } from 'src/shared/api/statement';
@@ -9,10 +10,8 @@ import { Payload } from 'src/shared/useFetch/types';
 import { useNotify } from 'src/shared/useNotify';
 import { cn } from 'src/shared/utils';
 
-import { CurrencySelector } from '../CurrencySelector';
-import { FormatSelector } from '../FormatSelector';
 import { useFileDrop } from '../lib/';
-import { useForm } from '../lib/useForm';
+import { FileInfo } from '../types';
 import styles from './FileForm.module.scss';
 
 const FileForm: FC = observer(() => {
@@ -21,48 +20,39 @@ const FileForm: FC = observer(() => {
 
   const { addErrorMessage, addSuccessMessage } = useNotify();
 
-  const { handleCheckboxChange, setValues, values } = useForm();
-
-  const handleUploadSuccess = (e: Payload<StatementType>) => {
-    statementList.addStatement(e.data);
-    addSuccessMessage({ message: e.message });
-    handleFormReset();
-  };
-
-  const handleUploadError = (e: Payload<StatementType>) => {
-    addErrorMessage({ message: e.message });
-    setValues.setIsFromValid(true);
-    handleReset();
-  };
-
-  const [{ error, handleReset }, uploadFile] = useFetch(uploadFileRequest, {
-    onError: handleUploadError,
-    onSuccess: handleUploadSuccess,
-  });
+  const [fileInfo, setFileInfo] = useState<FileInfo | null>(null);
+  const [isFormValid, setIsFromValid] = useState(false);
+  const [name, setName] = useState('');
 
   const fileStateUpdateHandler = (files: FileList) => {
     for (const file of files) {
       const { name, size } = file;
-      setValues.setFileInfo({ file, name, size });
-      setValues.setName(name);
-      setValues.setIsFromValid(!!name);
+      setFileInfo({ file, name, size });
+      setName(name);
+      setIsFromValid(!!name);
     }
   };
 
   const { handleFileDragLeave, handleFileDragOver, handleFileDrop, isHover } = useFileDrop(fileStateUpdateHandler);
 
   const handleFormReset = () => {
-    setValues.setFileInfo(null);
-    setValues.setName('');
-    setValues.setIsFromValid(false);
+    setFileInfo(null);
+    setName('');
+    setIsFromValid(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
-    handleReset();
   };
 
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!values.fileInfo) return;
-    console.log(values.fileInfo);
+    if (!fileInfo) return;
+    const reader = new FileReader();
+
+    reader.addEventListener('load', (e) => {
+      if (!reader.result) return;
+      const converter = new Converter(reader.result);
+    });
+
+    reader.readAsText(fileInfo.file);
     // void uploadFile({ currencies, file: fileInfo.file, name });
   };
 
@@ -78,55 +68,41 @@ const FileForm: FC = observer(() => {
 
   const handleTextInputChange = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
     const trimmedValue = value.trim();
-    setValues.setName(trimmedValue);
-    setValues.setIsFromValid(!!trimmedValue && !!values.fileInfo?.name);
+    setName(trimmedValue);
+    setIsFromValid(!!trimmedValue && !!fileInfo?.name);
   };
 
   useEffect(() => {
     textInputRef.current?.select();
     textInputRef.current?.focus();
-  }, [values.fileInfo]);
+  }, [fileInfo]);
 
-  const handleCurrenciesChange = useCallback(
-    ({ direction, value }: { direction: ConvertDirections; value: Currencies }) => {
-      setValues.setCurrencies((state) => ({ ...state, [direction]: value }));
-    },
-    [setValues]
-  );
-
-  const isResetButtonDisabled = !values.fileInfo;
-  const isUploadButtonDisabled = !values.isFormValid || !!error;
+  const isResetButtonDisabled = !fileInfo;
+  const isUploadButtonDisabled = !isFormValid;
 
   return (
     <form onSubmit={handleFormSubmit}>
       <Box
-        className={cn(styles.form, isHover && styles.formHover, values.isFormValid && styles.formValid)}
+        className={cn(styles.form, isHover && styles.formHover, isFormValid && styles.formValid)}
         onDragLeave={handleFileDragLeave}
         onDragOver={handleFileDragOver}
         onDrop={handleFileDrop}
-        title={values.fileInfo?.name ? values.fileInfo?.name : ''}
+        title={fileInfo?.name ? fileInfo?.name : ''}
       >
-        {!!values.fileInfo?.name && (
+        {!!fileInfo?.name && (
           <Box className={styles.textWrapper} isTruncated>
-            <Text className={styles.filename}>{values.fileInfo.name}</Text>
+            <Text className={styles.filename}>{fileInfo.name}</Text>
             <Input
               className={styles.input}
               name="name"
               onChange={handleTextInputChange}
               ref={textInputRef}
               type="text"
-              value={values.name}
-            />
-            <FormatSelector />
-            <CurrencySelector
-              isSelectorEnabled={values.isSelectorEnabled}
-              onChange={handleCurrenciesChange}
-              onCheckboxChange={handleCheckboxChange}
-              values={values.currencies}
+              value={name}
             />
           </Box>
         )}
-        {!values.fileInfo && (
+        {!fileInfo && (
           <Text textAlign={'center'}>
             Drag'n'drop your statement or{' '}
             <Text as={'button'} className={styles.link} onClick={handleAddFileButtonClick} type="button">

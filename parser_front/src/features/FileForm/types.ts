@@ -16,7 +16,7 @@ export type HandleCurrenciesChangeType = ({
   value: Currencies;
 }) => void;
 
-export enum FORMATS {
+export enum FileFormat {
   CSV = 'csv',
   XLS = 'xls',
 }
