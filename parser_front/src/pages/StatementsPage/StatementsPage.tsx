@@ -1,8 +1,12 @@
+import { Container, Heading } from '@chakra-ui/react';
 import { FC } from 'react';
-import { Statements } from 'src/widgets/Statements';
 
 const StatementsPage: FC = () => {
-  return <Statements />;
+  return (
+    <Container maxW={'100%'}>
+      <Heading>StatementsPage</Heading>
+    </Container>
+  );
 };
 
 export { StatementsPage };

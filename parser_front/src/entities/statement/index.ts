@@ -1,2 +1,3 @@
-export { statement, Statement } from './model/index';
-export { StatementTable } from './ui';
+import { Statement } from './model';
+export const statement = new Statement();
+export { StatementTable } from './ui/StatementTable';

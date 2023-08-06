@@ -6,6 +6,7 @@ import { UploadFilePage } from 'src/pages/UploadFilePage';
 export enum ROUTE {
   ALL = '*',
   ROOT = '/',
+  STATEMENT = '/statement',
   STATEMENTS = '/statements',
   UPLOAD_FILE = '/upload',
 }
@@ -20,7 +21,7 @@ export const routes: RouteType[] = [
   { element: <UploadFilePage />, isNav: true, name: 'Upload File', path: ROUTE.UPLOAD_FILE },
   { element: <UploadFilePage />, isNav: false, name: 'Upload File', path: ROUTE.ROOT },
   { element: <StatementPage />, isNav: false, name: 'Statements', path: `${ROUTE.STATEMENTS}/:statementId` },
+  { element: <StatementPage />, isNav: true, name: 'Preview Statement', path: ROUTE.STATEMENT },
   { element: <StatementsPage />, isNav: true, name: 'Statements', path: ROUTE.STATEMENTS },
-  // { element: <Navigate replace to="/statements" />, isNav: false, name: 'Statements', path: '/statement' },
   { element: <Navigate replace to="/" />, isNav: false, name: 'Upload File', path: ROUTE.ALL },
 ];

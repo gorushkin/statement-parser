@@ -1,60 +1,34 @@
-import { Box, Button, Input, Text } from '@chakra-ui/react';
+import { Box, Text } from '@chakra-ui/react';
 import { observer } from 'mobx-react';
-import { ChangeEvent, FC, FormEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { Converter } from 'src/entities/converter';
-import { statementList } from 'src/entities/statementList';
-import { ConvertDirections, Currencies, StatementType } from 'src/shared/api/models';
-import { uploadFileRequest } from 'src/shared/api/statement';
-import { useFetch } from 'src/shared/useFetch';
-import { Payload } from 'src/shared/useFetch/types';
-import { useNotify } from 'src/shared/useNotify';
+import { ChangeEvent, FC, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { statement } from 'src/entities/statement';
+import { ROUTE } from 'src/shared/routes';
 import { cn } from 'src/shared/utils';
 
 import { useFileDrop } from '../lib/';
-import { FileInfo } from '../types';
 import styles from './FileForm.module.scss';
 
 const FileForm: FC = observer(() => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const textInputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
-  const { addErrorMessage, addSuccessMessage } = useNotify();
-
-  const [fileInfo, setFileInfo] = useState<FileInfo | null>(null);
-  const [isFormValid, setIsFromValid] = useState(false);
-  const [name, setName] = useState('');
-
-  const fileStateUpdateHandler = (files: FileList) => {
+  const handleSubmit = (files: FileList) => {
     for (const file of files) {
-      const { name, size } = file;
-      setFileInfo({ file, name, size });
-      setName(name);
-      setIsFromValid(!!name);
+      const { name } = file;
+      const reader = new FileReader();
+
+      reader.addEventListener('load', () => {
+        if (!reader.result) return;
+        statement.convert(reader.result, name);
+        navigate(ROUTE.STATEMENT);
+      });
+
+      reader.readAsText(file);
     }
   };
 
-  const { handleFileDragLeave, handleFileDragOver, handleFileDrop, isHover } = useFileDrop(fileStateUpdateHandler);
-
-  const handleFormReset = () => {
-    setFileInfo(null);
-    setName('');
-    setIsFromValid(false);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  };
-
-  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!fileInfo) return;
-    const reader = new FileReader();
-
-    reader.addEventListener('load', (e) => {
-      if (!reader.result) return;
-      const converter = new Converter(reader.result);
-    });
-
-    reader.readAsText(fileInfo.file);
-    // void uploadFile({ currencies, file: fileInfo.file, name });
-  };
+  const { handleFileDragLeave, handleFileDragOver, handleFileDrop, isHover } = useFileDrop(handleSubmit);
 
   const handleAddFileButtonClick = () => {
     if (!fileInputRef.current) return;
@@ -63,83 +37,31 @@ const FileForm: FC = observer(() => {
 
   const handleFileInputChange = ({ target: { files } }: ChangeEvent<HTMLInputElement>) => {
     if (!files) return;
-    fileStateUpdateHandler(files);
+    handleSubmit(files);
   };
-
-  const handleTextInputChange = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => {
-    const trimmedValue = value.trim();
-    setName(trimmedValue);
-    setIsFromValid(!!trimmedValue && !!fileInfo?.name);
-  };
-
-  useEffect(() => {
-    textInputRef.current?.select();
-    textInputRef.current?.focus();
-  }, [fileInfo]);
-
-  const isResetButtonDisabled = !fileInfo;
-  const isUploadButtonDisabled = !isFormValid;
 
   return (
-    <form onSubmit={handleFormSubmit}>
-      <Box
-        className={cn(styles.form, isHover && styles.formHover, isFormValid && styles.formValid)}
-        onDragLeave={handleFileDragLeave}
-        onDragOver={handleFileDragOver}
-        onDrop={handleFileDrop}
-        title={fileInfo?.name ? fileInfo?.name : ''}
-      >
-        {!!fileInfo?.name && (
-          <Box className={styles.textWrapper} isTruncated>
-            <Text className={styles.filename}>{fileInfo.name}</Text>
-            <Input
-              className={styles.input}
-              name="name"
-              onChange={handleTextInputChange}
-              ref={textInputRef}
-              type="text"
-              value={name}
-            />
-          </Box>
-        )}
-        {!fileInfo && (
-          <Text textAlign={'center'}>
-            Drag'n'drop your statement or{' '}
-            <Text as={'button'} className={styles.link} onClick={handleAddFileButtonClick} type="button">
-              click here
-            </Text>
-          </Text>
-        )}
-        <input
-          accept=".csv, .xls"
-          hidden={true}
-          name="file"
-          onChange={handleFileInputChange}
-          ref={fileInputRef}
-          type="file"
-        />
-      </Box>
-      <Box className={styles.buttonGroup}>
-        <Button
-          background={'red.400'}
-          isDisabled={isResetButtonDisabled}
-          onClick={handleFormReset}
-          size={'lg'}
-          variant={'outline'}
-        >
-          Reset
-        </Button>
-        <Button
-          background={'green.400'}
-          isDisabled={isUploadButtonDisabled}
-          size={'lg'}
-          type="submit"
-          variant={'solid'}
-        >
-          Upload
-        </Button>
-      </Box>
-    </form>
+    <Box
+      className={cn(styles.form, isHover && styles.formHover)}
+      onDragLeave={handleFileDragLeave}
+      onDragOver={handleFileDragOver}
+      onDrop={handleFileDrop}
+    >
+      <Text textAlign={'center'}>
+        Drag'n'drop your statement or{' '}
+        <Text as={'button'} className={styles.link} onClick={handleAddFileButtonClick} type="button">
+          click here
+        </Text>
+      </Text>
+      <input
+        accept=".csv, .xls"
+        hidden={true}
+        name="file"
+        onChange={handleFileInputChange}
+        ref={fileInputRef}
+        type="file"
+      />
+    </Box>
   );
 });
 

@@ -1,6 +1,3 @@
-export type Summary = {
-  endBalance: number;
-  income: number;
-  outcome: number;
-  startBalance: number;
-};
+export type Column = { [x: string]: string };
+export type Header = string;
+export type Transaction = { [x: string]: string };

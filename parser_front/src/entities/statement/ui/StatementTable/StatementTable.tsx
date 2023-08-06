@@ -1,42 +1,32 @@
 import { Heading, Table, TableContainer, Tbody } from '@chakra-ui/react';
 import { observer } from 'mobx-react';
-import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { FC, useLayoutEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ROUTE } from 'src/shared/routes';
 
-import { statement } from '../../model';
+import { statement } from '../..';
+import { StatementRow } from '../../StatementRow';
 import { StatementHead } from '../StatementHead';
-import { StatementRow } from '../StatementRow';
-import { StatementSummary } from '../StatementSummary';
 import styles from './StatementTable.module.scss';
 
-export const StatementTable = observer(() => {
-  const { statementId } = useParams();
+const StatementTable: FC = observer(() => {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!statementId) return;
-    statement.getStatement(statementId);
-  }, [statementId]);
-
-  if (!statementId) navigate(ROUTE.STATEMENTS);
+  useLayoutEffect(() => {
+    if (!statement.name) navigate(ROUTE.ALL);
+  });
 
   return (
     <>
       <Heading as="h1" mb="5" textAlign="center">
         {statement.name}
       </Heading>
-      <StatementSummary
-        convertedSummary={statement.convertedSummary}
-        currencies={statement.currencies}
-        summary={statement.summary}
-      />
       <TableContainer className={styles.tableContainer}>
         <Table className={styles.table} variant="simple">
-          <StatementHead />
+          <StatementHead headers={statement.headers} />
           <Tbody>
-            {statement.transactions.map((row) => (
-              <StatementRow key={row.id} row={row} />
+            {statement.rows.map((row, index) => (
+              <StatementRow key={index} row={row} />
             ))}
           </Tbody>
         </Table>
@@ -44,3 +34,5 @@ export const StatementTable = observer(() => {
     </>
   );
 });
+
+export { StatementTable };
