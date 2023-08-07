@@ -1,7 +1,7 @@
 import { Td, Tr } from '@chakra-ui/react';
 import { FC } from 'react';
 
-import { Transaction } from '../model/types';
+import { Transaction } from '../../model/types';
 import styles from './StatementRow.module.scss';
 
 interface StatementRowProps {

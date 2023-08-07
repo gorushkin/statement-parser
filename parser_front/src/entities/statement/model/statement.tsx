@@ -37,6 +37,7 @@ export class Statement extends DB {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     this.key = uuid();
     this.headers = this.getHeaders(data.toString());
+    console.log('this.headers: ', this.headers);
     this.rows = this.getBody(data.toString());
   }
 }

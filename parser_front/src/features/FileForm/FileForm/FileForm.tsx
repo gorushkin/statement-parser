@@ -23,8 +23,8 @@ const FileForm: FC = observer(() => {
         statement.convert(reader.result, name);
         navigate(ROUTE.STATEMENT);
       });
-
-      reader.readAsText(file);
+      // TODO: add encoding selector
+      reader.readAsText(file, 'CP1251');
     }
   };
 
