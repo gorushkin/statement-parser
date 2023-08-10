@@ -1,12 +1,12 @@
 import { Th, Thead, Tr } from '@chakra-ui/react';
 import { FC } from 'react';
 
-import styles from './StatementHead.module.scss';
-interface StatementHeadProps {
+import styles from './StatementTableHead.module.scss';
+interface StatementTableHeadProps {
   headers: string[];
 }
 
-const StatementHead: FC<StatementHeadProps> = ({ headers }) => (
+const StatementTableHead: FC<StatementTableHeadProps> = ({ headers }) => (
   <Thead className={styles.tableHeader}>
     <Tr>
       {headers.map((item, idx) => (
@@ -16,4 +16,4 @@ const StatementHead: FC<StatementHeadProps> = ({ headers }) => (
   </Thead>
 );
 
-export { StatementHead };
+export { StatementTableHead };

@@ -21,7 +21,7 @@ const FileForm: FC = observer(() => {
       reader.addEventListener('load', () => {
         if (!reader.result) return;
         statement.convert(reader.result, name);
-        navigate(ROUTE.STATEMENT);
+        navigate(ROUTE.STATEMENT_PREVIEW);
       });
       // TODO: add encoding selector
       reader.readAsText(file, 'CP1251');

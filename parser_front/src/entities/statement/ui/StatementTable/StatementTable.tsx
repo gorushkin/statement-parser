@@ -1,10 +1,11 @@
 import { Table, TableContainer, Tbody } from '@chakra-ui/react';
 import { FC } from 'react';
 
+// TODO: move types somewhere else
 import { Header, Transaction } from '../../model/types';
-import { StatementHead } from '../StatementHead';
-import { StatementRow } from '../StatementRow';
 import styles from './StatementTable.module.scss';
+import { StatementTableHead } from './StatementTableHead';
+import { StatementTableRow } from './StatementTableRow';
 
 interface StatementTableProps {
   headers: Header[];
@@ -17,10 +18,10 @@ const StatementTable: FC<StatementTableProps> = (props) => {
     <>
       <TableContainer className={styles.tableContainer}>
         <Table className={styles.table} variant="simple">
-          <StatementHead headers={headers} />
+          <StatementTableHead headers={headers} />
           <Tbody>
             {rows.map((row, index) => (
-              <StatementRow key={index} row={row} />
+              <StatementTableRow key={index} row={row} />
             ))}
           </Tbody>
         </Table>
